@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="za.dams.kiosque">
 
     <application
@@ -19,8 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
-
+    <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
 
 </manifest>

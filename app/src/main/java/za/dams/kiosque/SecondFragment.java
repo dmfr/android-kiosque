@@ -58,7 +58,7 @@ public class SecondFragment extends Fragment {
         //mWebView.setFocusableInTouchMode(false);
         //mWebView.setFocusable(false);
         mWebView.setInitialScale(250) ;
-        mWebView.loadUrl("https://tracypda.dev.mirabel-sil.com/");
+        mWebView.loadUrl("https://tracypda.dev.mirabel-sil.com/index-dev.html");
 
     }
 
@@ -79,7 +79,10 @@ public class SecondFragment extends Fragment {
     }
 
 
-
+    public void callJavascript() {
+        String param = "test1234" ;
+        mWebView.loadUrl("javascript:testFromJava(\""+param+"\")");
+    }
 
 
 
