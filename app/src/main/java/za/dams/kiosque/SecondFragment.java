@@ -84,6 +84,12 @@ public class SecondFragment extends Fragment {
         mWebView.loadUrl("javascript:testFromJava(\""+param+"\")");
     }
 
+    public void pushScanResult(String scanResult) {
+        Log.w("DAMS","pushScanResult = "+scanResult) ;
+        final String javaEvent = "scan" ;
+        mWebView.loadUrl("javascript:postFromJava(\""+javaEvent+"\",\""+scanResult+"\")");
+    }
+
 
 
 }

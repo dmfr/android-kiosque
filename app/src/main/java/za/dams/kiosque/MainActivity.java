@@ -32,7 +32,10 @@ import android.widget.Toolbar;
 
 
 public class MainActivity extends Activity
-implements FirstFragment.OnButtonClickedListener, FragmentManager.OnBackStackChangedListener {
+implements FirstFragment.OnButtonClickedListener
+        , FragmentManager.OnBackStackChangedListener
+        , ScanFragment.ScanListener
+{
 
     private final Handler mUpdateUiHandler = new Handler() {
         @Override
@@ -260,6 +263,18 @@ implements FirstFragment.OnButtonClickedListener, FragmentManager.OnBackStackCha
 
         // Create and show the dialog.
         ScanFragment newFragment = ScanFragment.newInstance("str1","str2");
+        newFragment.setListener(this);
         newFragment.show(ft, "dialog");
+    }
+
+    @Override
+    public void onScanResult(String scanResult) {
+        Log.w("DAMS","Scan result = "+scanResult);
+        Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
+        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof SecondFragment) ;
+        if( isWebSession ) {
+            SecondFragment sf = (SecondFragment)currentBackStackFragment ;
+            sf.pushScanResult(scanResult);
+        }
     }
 }

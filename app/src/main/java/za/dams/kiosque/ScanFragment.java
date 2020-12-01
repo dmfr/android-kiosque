@@ -29,6 +29,9 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ScanFragment extends DialogFragment {
+    public interface ScanListener {
+        void onScanResult(String scanResult);
+    }
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -41,6 +44,8 @@ public class ScanFragment extends DialogFragment {
 
     DecoratedBarcodeView barcodeView;
 
+    private ScanListener mListener ;
+
     private BarcodeCallback callback = new BarcodeCallback() {
         @Override
         public void barcodeResult(BarcodeResult result) {
@@ -51,13 +56,17 @@ public class ScanFragment extends DialogFragment {
                 }*/
 
             //lastText = result.getText();
-            barcodeView.setStatusText(result.getText());
+            //barcodeView.setStatusText(result.getText());
 
             //beepManager.playBeepSoundAndVibrate();
 
             //Added preview of scanned barcode
             //ImageView imageView = findViewById(R.id.barcodePreview);
             //imageView.setImageBitmap(result.getBitmapWithResultPoints(Color.YELLOW));
+            if( mListener != null ) {
+                mListener.onScanResult(result.getText());
+            }
+            ScanFragment.this.dismiss();
         }
 
         @Override
@@ -65,7 +74,9 @@ public class ScanFragment extends DialogFragment {
         }
     };
 
-
+    public void setListener( ScanListener sl ) {
+        mListener = sl ;
+    }
 
     public ScanFragment() {
         // Required empty public constructor
