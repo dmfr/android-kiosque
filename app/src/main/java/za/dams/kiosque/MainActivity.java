@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.Toolbar;
 
 
@@ -43,6 +44,8 @@ implements FirstFragment.OnButtonClickedListener
             updateUI();
         }
     };
+
+    private MenuItem mCheckToolbar ;
 
     @SuppressLint("NewApi")
     @Override
@@ -74,6 +77,7 @@ implements FirstFragment.OnButtonClickedListener
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        mCheckToolbar = menu.findItem(R.id.check_toolbar) ;
         return true;
     }
 
@@ -83,6 +87,12 @@ implements FirstFragment.OnButtonClickedListener
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        switch( id ) {
+            case R.id.check_toolbar :
+                item.setChecked( !item.isChecked() ) ;
+                break ;
+        }
+
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
@@ -161,7 +171,7 @@ implements FirstFragment.OnButtonClickedListener
         getWindow().getDecorView().setSystemUiVisibility(0);
 
         ActionBar actionBar = getActionBar();
-        //actionBar.show();
+        actionBar.show();
     }
     private void hideSystemUI() {
         // Prevent actionbar from disabling fullscreen
@@ -179,8 +189,12 @@ implements FirstFragment.OnButtonClickedListener
                 // Low profile ?
                 |View.SYSTEM_UI_FLAG_LOW_PROFILE);
 
-        ActionBar actionBar = getActionBar();
-        //actionBar.hide();
+        //CheckBox checkboxToolbar = (CheckBox)(findViewById(R.id.check_toolbar));
+        boolean keepToolbarVisible = mCheckToolbar != null && mCheckToolbar.isChecked() ;
+        if( !keepToolbarVisible ) {
+            ActionBar actionBar = getActionBar();
+            actionBar.hide();
+        }
     }
 
     private void setupKeyboardVisibilityListener() {
