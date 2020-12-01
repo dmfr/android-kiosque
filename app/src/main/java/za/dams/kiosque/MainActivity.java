@@ -16,12 +16,8 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
@@ -252,7 +248,7 @@ implements FirstFragment.OnButtonClickedListener, FragmentManager.OnBackStackCha
 
 
     public void scanFragment() {
-// DialogFragment.show() will take care of adding the fragment
+        // DialogFragment.show() will take care of adding the fragment
         // in a transaction.  We also want to remove any currently showing
         // dialog, so make our own transaction and take care of that here.
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -263,7 +259,7 @@ implements FirstFragment.OnButtonClickedListener, FragmentManager.OnBackStackCha
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        ScannerFragment newFragment = ScannerFragment.newInstance("str1","str2");
+        ScanFragment newFragment = ScanFragment.newInstance("str1","str2");
         newFragment.show(ft, "dialog");
     }
 }
