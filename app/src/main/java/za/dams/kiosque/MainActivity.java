@@ -58,7 +58,7 @@ implements FirstFragment.OnButtonClickedListener
         getFragmentManager().addOnBackStackChangedListener(this);
 
         if (savedInstanceState == null) {
-            FirstFragment firstFrag = new FirstFragment() ;
+            LinksListFragment firstFrag = new LinksListFragment() ;
 
             FragmentTransaction ft = getFragmentManager().beginTransaction() ;
             ft.add(R.id.fragment_container, (Fragment)firstFrag);
