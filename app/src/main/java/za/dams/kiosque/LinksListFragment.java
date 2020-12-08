@@ -8,12 +8,14 @@ import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.http.params.HttpConnectionParams;
@@ -37,10 +39,17 @@ public class LinksListFragment extends ListFragment implements LoaderManager.Loa
     private Activity mContext;
     //private SettingsCallbacks mCallback ;
 
+    private View mListContainer ;
+    private View mProgressContainer ;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        //return super.onCreateView(inflater, container, savedInstanceState);
+        View v = inflater.inflate(R.layout.fragment_linkslist, container, false);
+        mListContainer = v.findViewById(R.id.listContainer) ;
+        mProgressContainer = v.findViewById(R.id.progressContainer) ;
+        return v ;
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -56,13 +65,20 @@ public class LinksListFragment extends ListFragment implements LoaderManager.Loa
         setListShown(true) ;
          */
 
-        setEmptyText("No profiles defined");
+        //setEmptyText("No profiles defined");
         getLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
     @Override
     public Loader<List<LinksManager.LinkModel>> onCreateLoader(int i, Bundle bundle) {
+        setListShown(false) ;
         return new LinksLoader( getActivity() );
+    }
+
+    public void setListShown(boolean torf) {
+        Log.w("DAMS","Set list shown = "+torf);
+        mListContainer.setVisibility( torf ? View.VISIBLE : View.GONE );
+        mProgressContainer.setVisibility( !torf ? View.VISIBLE : View.GONE );
     }
 
     @Override
@@ -191,10 +207,12 @@ public class LinksListFragment extends ListFragment implements LoaderManager.Loa
     private static class LinksLoader extends AsyncTaskLoader<List<LinksManager.LinkModel>> {
 
         List<LinksManager.LinkModel> mData;
+        Context mContext ;
 
 
         public LinksLoader(Context context) {
             super(context);
+            mContext = context ;
         }
 
         /**
@@ -210,8 +228,9 @@ public class LinksListFragment extends ListFragment implements LoaderManager.Loa
             }
 
             //Log.w(TAG,"Response from server : "+response) ;
-            ArrayList<LinksManager.LinkModel> entries = new ArrayList<LinksManager.LinkModel>();
-             return entries;
+            //ArrayList<LinksManager.LinkModel> entries = new ArrayList<LinksManager.LinkModel>();
+             //return entries;
+            return LinksManager.getLinks(mContext) ;
         }
 
         /**
