@@ -28,7 +28,6 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.CheckBox;
 import android.widget.Toolbar;
 
 
@@ -36,6 +35,7 @@ public class MainActivity extends Activity
 implements FirstFragment.OnButtonClickedListener
         , FragmentManager.OnBackStackChangedListener
         , ScanFragment.ScanListener
+        , LinkListFragment.LinkListActionListener
 {
 
     private final Handler mUpdateUiHandler = new Handler() {
@@ -58,7 +58,8 @@ implements FirstFragment.OnButtonClickedListener
         getFragmentManager().addOnBackStackChangedListener(this);
 
         if (savedInstanceState == null) {
-            LinksListFragment firstFrag = new LinksListFragment() ;
+            LinkListFragment firstFrag = new LinkListFragment() ;
+            firstFrag.setLinkListActionListener(this);
 
             FragmentTransaction ft = getFragmentManager().beginTransaction() ;
             ft.add(R.id.fragment_container, (Fragment)firstFrag);
@@ -115,9 +116,19 @@ implements FirstFragment.OnButtonClickedListener
 
     @Override
     public void onAttachFragment(Fragment fragment) {
+        // https://medium.com/better-programming/proper-fragment-communication-in-android-489fcac520b0
         Log.w("DAMS","atacched fragment");
         if( fragment instanceof FirstFragment) {
             ((FirstFragment) fragment).setOnButtonClickedListener(this);
+        }
+        if( fragment instanceof ScanFragment ) {
+            ((ScanFragment) fragment).setListener(this);
+        }
+        if( fragment instanceof LinkListFragment ) {
+            ((LinkListFragment) fragment).setLinkListActionListener(this);
+        }
+        if( fragment instanceof LinkAddFragment ) {
+            //((LinkAddFragment) fragment).setLinkListActionListener(this);
         }
     }
 
@@ -277,7 +288,6 @@ implements FirstFragment.OnButtonClickedListener
 
         // Create and show the dialog.
         ScanFragment newFragment = ScanFragment.newInstance("str1","str2");
-        newFragment.setListener(this);
         newFragment.show(ft, "dialog");
     }
 
@@ -290,5 +300,19 @@ implements FirstFragment.OnButtonClickedListener
             SecondFragment sf = (SecondFragment)currentBackStackFragment ;
             sf.pushScanResult(scanResult);
         }
+    }
+
+    @Override
+    public void onLinkAdd() {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        LinkAddFragment newFragment = LinkAddFragment.newInstance();
+        newFragment.show(ft, "dialog");
     }
 }

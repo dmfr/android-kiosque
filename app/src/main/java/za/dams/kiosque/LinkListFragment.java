@@ -7,32 +7,35 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.http.params.HttpConnectionParams;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
 import za.dams.kiosque.util.LinksManager;
 
 //https://stackoverflow.com/questions/11770773/listfragment-layout-from-xml
 
-public class LinksListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<LinksManager.LinkModel>> {
+public class LinkListFragment extends ListFragment
+        implements LoaderManager.LoaderCallbacks<List<LinksManager.LinkModel>>
+        ,View.OnClickListener{
+    private LinkListActionListener mListener ;
+
+    public interface LinkListActionListener {
+        public void onLinkAdd() ;
+    }
+    public void setLinkListActionListener(LinkListFragment.LinkListActionListener listener) {
+        mListener = listener ;
+    }
+
     private static final String TAG = "LinksListFragment";
     private static final int LOADER_ID = 1 ;
 
@@ -41,16 +44,26 @@ public class LinksListFragment extends ListFragment implements LoaderManager.Loa
 
     private View mListContainer ;
     private View mProgressContainer ;
+    private View mFab ;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.fragment_linkslist, container, false);
-        mListContainer = v.findViewById(R.id.listContainer) ;
-        mProgressContainer = v.findViewById(R.id.progressContainer) ;
-        return v ;
+        return inflater.inflate(R.layout.fragment_linkslist, container, false);
     }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        mListContainer = view.findViewById(R.id.listContainer) ;
+        mProgressContainer = view.findViewById(R.id.progressContainer) ;
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(this);
+        mFab = fab ;
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -100,6 +113,13 @@ public class LinksListFragment extends ListFragment implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<List<LinksManager.LinkModel>> loader) {
         setListAdapter(null);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if( view==mFab && mListener != null ) {
+            mListener.onLinkAdd();
+        }
     }
 
     private class LinksAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
@@ -195,7 +215,7 @@ public class LinksListFragment extends ListFragment implements LoaderManager.Loa
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)  {
             LinksManager.LinkModel clickedLink = getItem(position) ;
 
-            LinksListFragment.this.onLinkClicked(clickedLink) ;
+            LinkListFragment.this.onLinkClicked(clickedLink) ;
         }
 
 
@@ -222,7 +242,7 @@ public class LinksListFragment extends ListFragment implements LoaderManager.Loa
          */
         @Override public List<LinksManager.LinkModel> loadInBackground() {
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
