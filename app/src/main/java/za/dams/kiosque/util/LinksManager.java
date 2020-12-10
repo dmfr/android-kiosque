@@ -28,4 +28,17 @@ public class LinksManager {
         list.add( lm1 ) ;
         return list ;
     }
+    public static void storeLinks(Context context, List<LinkModel> linkModels) {
+        
+    }
+    public static LinkModel getLinkByIdx(Context context, int linkIdx) {
+        List<LinkModel> list = getLinks(context) ;
+        if( list.size() >= linkIdx + 1 ) {
+            return list.get(linkIdx) ;
+        }
+        return null ;
+    }
+    public static void storeLinkAtIdx( Context context, LinkModel linkModel, int linkIdx ) {
+
+    }
 }

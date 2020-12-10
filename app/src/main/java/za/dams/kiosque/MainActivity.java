@@ -312,7 +312,7 @@ implements FirstFragment.OnButtonClickedListener
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        LinkAddFragment newFragment = LinkAddFragment.newInstance();
+        LinkAddFragment newFragment = LinkAddFragment.newInstance(0);
         newFragment.show(ft, "dialog");
     }
 }
