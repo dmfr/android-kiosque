@@ -7,6 +7,17 @@
 
     <TextView
         android:layout_marginTop="12dp"
+        android:id="@+id/lbl_name" android:text="Name"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/txt_name"
+        android:layout_width="match_parent"  android:layout_height="wrap_content"
+        android:inputType="text"
+        android:imeOptions="actionDone" />
+
+    <TextView
+        android:layout_marginTop="12dp"
         android:id="@+id/lbl_urlBase" android:text="Base URL"
         android:layout_width="wrap_content" android:layout_height="wrap_content" />
 

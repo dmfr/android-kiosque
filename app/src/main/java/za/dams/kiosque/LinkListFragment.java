@@ -5,6 +5,7 @@ import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
@@ -368,5 +369,13 @@ public class LinkListFragment extends ListFragment
     }
 
 
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch( requestCode ) {
+            case LinkAddFragment.REQUEST_CODE :
+                if( requestCode == LinkAddFragment.RESULT_SAVED ) {
+                    forceReload();
+                }
+        }
+    }
 }

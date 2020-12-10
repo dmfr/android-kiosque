@@ -3,6 +3,7 @@ package za.dams.kiosque;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,11 +18,15 @@ import androidx.annotation.Nullable;
 
 import za.dams.kiosque.util.LinksManager;
 
-public class LinkAddFragment extends DialogFragment {
+public class LinkAddFragment extends DialogFragment implements DialogInterface.OnClickListener {
+    public static final int REQUEST_CODE = 1 ;
+    public static final int RESULT_SAVED = 1 ;
     private static final String ARG_LINKIDX = "link_idx";
+
     private int mLinkIdx ;
     private LinksManager.LinkModel mModel ;
 
+    private TextView mTxtName ;
     private TextView mTxtUrlBase ;
     private TextView mTxtUrlParams ;
     private CheckBox mChkIsProd ;
@@ -61,6 +66,7 @@ public class LinkAddFragment extends DialogFragment {
         modelToFields() ;
     }
     private void modelToFields() {
+        mTxtName.setText(mModel.name);
         mTxtUrlBase.setText(mModel.urlBase);
         mTxtUrlParams.setText(mModel.urlParams);
         mChkIsProd.setChecked(mModel.isProd);
@@ -76,6 +82,7 @@ public class LinkAddFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // https://medium.com/@rmirabelle/how-to-set-dialogfragment-width-and-height-733c5b174178
         View v = getActivity().getLayoutInflater().inflate(R.layout.fragment_linkadd, null, false);
+        mTxtName = (TextView)v.findViewById(R.id.txt_name) ;
         mTxtUrlBase = (TextView)v.findViewById(R.id.txt_urlBase) ;
         mTxtUrlParams = (TextView)v.findViewById(R.id.txt_urlParams) ;
         mChkIsProd = (CheckBox)v.findViewById(R.id.chk_isProd) ;
@@ -83,8 +90,8 @@ public class LinkAddFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit link");
         builder.setView(v);
-        builder.setNegativeButton("Cancel", null);
-        builder.setPositiveButton("Save", null);
+        builder.setNegativeButton("Cancel", this);
+        builder.setPositiveButton("Save", this);
         return builder.show();
     }
 
@@ -101,4 +108,19 @@ public class LinkAddFragment extends DialogFragment {
     }
 
 
+    @Override
+    public void onClick(DialogInterface dialogInterface, int i) {
+        switch( i ) {
+            case DialogInterface.BUTTON_POSITIVE :
+                if( getTargetFragment() != null ) {
+                    getTargetFragment().onActivityResult(getTargetRequestCode(),RESULT_SAVED,null);
+                }
+                Log.w("DAMS","BUTTON_POSITIVE");
+                break ;
+
+            case DialogInterface.BUTTON_NEGATIVE :
+                Log.w("DAMS","BUTTON_NEGATIVE");
+                break ;
+        }
+    }
 }

@@ -62,7 +62,7 @@ implements FirstFragment.OnButtonClickedListener
             firstFrag.setLinkListActionListener(this);
 
             FragmentTransaction ft = getFragmentManager().beginTransaction() ;
-            ft.add(R.id.fragment_container, (Fragment)firstFrag);
+            ft.add(R.id.fragment_container, (Fragment)firstFrag, "visible_fragment");
             ft.commit();
             Log.w("DAMS","Adding fragment") ;
         }
@@ -312,7 +312,11 @@ implements FirstFragment.OnButtonClickedListener
         ft.addToBackStack(null);
 
         // Create and show the dialog.
+        Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
         LinkAddFragment newFragment = LinkAddFragment.newInstance(0);
+        if( currentBackStackFragment instanceof LinkListFragment ) {
+            newFragment.setTargetFragment(currentBackStackFragment,LinkAddFragment.REQUEST_CODE);
+        }
         newFragment.show(ft, "dialog");
     }
 }
