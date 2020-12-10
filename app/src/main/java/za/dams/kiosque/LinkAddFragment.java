@@ -18,7 +18,7 @@ public class LinkAddFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Log.w("DAMS","onCreateDialog") ;
+        // https://medium.com/@rmirabelle/how-to-set-dialogfragment-width-and-height-733c5b174178
         View v = getActivity().getLayoutInflater().inflate(R.layout.fragment_linkadd, null, false);
         if( v == null ) {
             Log.w("DAMS","is null") ;
@@ -26,7 +26,7 @@ public class LinkAddFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle("Create Year");
+        builder.setTitle("Edit link");
         builder.setView(v);
         builder.setNegativeButton("Cancel", null);
         builder.setPositiveButton("Save", null);
