@@ -72,10 +72,14 @@ public class LinkAddFragment extends DialogFragment implements DialogInterface.O
         mChkIsProd.setChecked(mModel.isProd);
     }
     private void saveModel() {
-
+        fieldsToModel();
+        LinksManager.storeLinkAtIdx(getActivity(), mModel, mLinkIdx);
     }
     private void fieldsToModel() {
-
+        mModel.name = mTxtName.getText().toString().trim() ;
+        mModel.urlBase = mTxtUrlBase.getText().toString().trim() ;
+        mModel.urlParams = mTxtUrlParams.getText().toString().trim() ;
+        mModel.isProd = mChkIsProd.isChecked() ;
     }
 
     @Override
@@ -115,6 +119,7 @@ public class LinkAddFragment extends DialogFragment implements DialogInterface.O
                 if( getTargetFragment() != null ) {
                     getTargetFragment().onActivityResult(getTargetRequestCode(),RESULT_SAVED,null);
                 }
+                saveModel() ;
                 Log.w("DAMS","BUTTON_POSITIVE");
                 break ;
 

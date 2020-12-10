@@ -2,6 +2,7 @@ package za.dams.kiosque.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,12 +62,12 @@ public class LinksManager {
                 objectInArray.put("name", lm.name);
                 objectInArray.put("urlBase", lm.urlBase);
                 objectInArray.put("urlParams", lm.urlParams);
-                objectInArray.put("name", lm.isProd);
+                objectInArray.put("isProd", lm.isProd);
                 jsonArray.put(objectInArray) ;
             }
         } catch (JSONException e)  {}
 
-        SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS_NAME,0);
+        SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS_NAME,Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(SHARED_PREFS_KEY,jsonArray.toString()) ;
         editor.apply();
