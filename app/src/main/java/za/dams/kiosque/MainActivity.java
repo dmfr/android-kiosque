@@ -38,6 +38,7 @@ implements FirstFragment.OnButtonClickedListener
         , FragmentManager.OnBackStackChangedListener
         , ScanFragment.ScanListener
         , LinkListFragment.LinkListActionListener
+        , SettingZoomFragment.OnZoomFactorChangerListener
 {
 
     private final Handler mUpdateUiHandler = new Handler() {
@@ -98,13 +99,8 @@ implements FirstFragment.OnButtonClickedListener
 
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
-            boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof SecondFragment) ;
-            if( isWebSession ) {
-                SecondFragment sf = (SecondFragment)currentBackStackFragment ;
-                sf.callJavascript() ;
-            }
+        if (id == R.id.action_setting_zoom) {
+            openSettingZoom() ;
         }
         if (id == R.id.action_barcode) {
             scanBarcode();
@@ -131,6 +127,9 @@ implements FirstFragment.OnButtonClickedListener
         }
         if( fragment instanceof LinkAddFragment ) {
             //((LinkAddFragment) fragment).setLinkListActionListener(this);
+        }
+        if( fragment instanceof SettingZoomFragment ) {
+            ((SettingZoomFragment)fragment).setListener(this);
         }
     }
 
@@ -277,6 +276,23 @@ implements FirstFragment.OnButtonClickedListener
     }
 
 
+    public void openSettingZoom() {
+        // DialogFragment.show() will take care of adding the fragment
+        // in a transaction.  We also want to remove any currently showing
+        // dialog, so make our own transaction and take care of that here.
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        SettingZoomFragment newFragment = SettingZoomFragment.newInstance(0);
+        newFragment.show(ft, "dialog");
+    }
+
+
     public void scanFragment() {
         // DialogFragment.show() will take care of adding the fragment
         // in a transaction.  We also want to remove any currently showing
@@ -351,5 +367,15 @@ implements FirstFragment.OnButtonClickedListener
             // HACK to force reload (through ActivityResult)?
             currentBackStackFragment.onActivityResult(LinkAddFragment.REQUEST_CODE,LinkAddFragment.RESULT_SAVED,null);
         }
+    }
+
+    @Override
+    public void onZoomFactorChanged(int zoomFactor) {
+        // Create and show the dialog.
+        Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
+        if( currentBackStackFragment instanceof SecondFragment ) {
+            ((SecondFragment)currentBackStackFragment).applyZoomFactor() ;
+        }
+
     }
 }
