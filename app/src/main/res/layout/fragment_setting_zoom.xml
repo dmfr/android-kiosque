@@ -20,7 +20,6 @@
             android:gravity="center"
             android:layout_marginBottom="8dp"
             style="?android:attr/textAppearanceMedium"
-            android:text="Pouet"
             />
 
         <SeekBar

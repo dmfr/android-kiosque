@@ -17,16 +17,37 @@ import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
+import za.dams.kiosque.util.SettingsManager;
+
 
 public class SecondFragment extends Fragment {
     private Activity mActivity ;
     private WebView mWebView;
     private ImageView mloadingView;
 
+    private static final String ARG_URL = "url";
+    private String mUrl;
+
+    public SecondFragment() {
+        // Required empty public constructor
+    }
+    public static SecondFragment newInstance(String url) {
+        SecondFragment fragment = new SecondFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_URL, url);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
     @SuppressLint("NewApi")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState) ;
+
+        if (getArguments() != null) {
+            mUrl = getArguments().getString(ARG_URL);
+        }
 
         setRetainInstance(true);
 
@@ -57,9 +78,16 @@ public class SecondFragment extends Fragment {
         // Log.d(TAG, result.toString());
         //mWebView.setFocusableInTouchMode(false);
         //mWebView.setFocusable(false);
-        mWebView.setInitialScale(250) ;
-        mWebView.loadUrl("https://tracypda.dev.mirabel-sil.com/index-dev.html");
+        applyZoomFactor() ;
+        //mWebView.loadUrl("https://tracypda.dev.mirabel-sil.com/index-dev.html");
+        mWebView.loadUrl(mUrl) ;
+    }
 
+    public void applyZoomFactor() {
+        int zoomFactor = SettingsManager.getZoomFactor(mActivity);
+        if( mWebView != null ) {
+            mWebView.setInitialScale(zoomFactor) ;
+        }
     }
 
     @Override
@@ -78,11 +106,6 @@ public class SecondFragment extends Fragment {
         mActivity = getActivity() ;
     }
 
-
-    public void callJavascript() {
-        String param = "test1234" ;
-        mWebView.loadUrl("javascript:testFromJava(\""+param+"\")");
-    }
 
     public void pushScanResult(String scanResult) {
         Log.w("DAMS","pushScanResult = "+scanResult) ;

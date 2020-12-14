@@ -288,7 +288,7 @@ implements FirstFragment.OnButtonClickedListener
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        SettingZoomFragment newFragment = SettingZoomFragment.newInstance(0);
+        SettingZoomFragment newFragment = SettingZoomFragment.newInstance();
         newFragment.show(ft, "dialog");
     }
 
@@ -318,6 +318,17 @@ implements FirstFragment.OnButtonClickedListener
             SecondFragment sf = (SecondFragment)currentBackStackFragment ;
             sf.pushScanResult(scanResult);
         }
+    }
+
+    @Override
+    public void onLinkClick(int linkIdx) {
+        SecondFragment firstFrag = SecondFragment.newInstance( LinksManager.getLinkByIdx(this,linkIdx).getUrl() ) ;
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction() ;
+        ft.replace(R.id.fragment_container, (Fragment)firstFrag,"visible_fragment");
+        ft.addToBackStack(null);
+        //ft.addOnBackStackChangedListener(this) ;
+        ft.commit();
     }
 
     @Override
@@ -374,7 +385,7 @@ implements FirstFragment.OnButtonClickedListener
         // Create and show the dialog.
         Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
         if( currentBackStackFragment instanceof SecondFragment ) {
-            ((SecondFragment)currentBackStackFragment).applyZoomFactor() ;
+            //((SecondFragment)currentBackStackFragment).applyZoomFactor() ;
         }
 
     }

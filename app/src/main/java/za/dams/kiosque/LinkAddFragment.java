@@ -48,6 +48,7 @@ public class LinkAddFragment extends DialogFragment
         if (getArguments() != null) {
             mLinkIdx = getArguments().getInt(ARG_LINKIDX);
         }
+        loadModel() ;
     }
 
     @Override
@@ -56,7 +57,7 @@ public class LinkAddFragment extends DialogFragment
         if( savedInstanceState != null ) {
             // TODO : restore key-in values ?
         } else {
-            loadModel() ;
+            modelToFields() ;
         }
     }
 
@@ -67,7 +68,7 @@ public class LinkAddFragment extends DialogFragment
         if( mModel == null ){
             mModel = new LinksManager.LinkModel() ;
         }
-        modelToFields() ;
+        //modelToFields() ;
         return true ;
     }
     private boolean modelToFields() {

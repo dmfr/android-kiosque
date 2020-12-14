@@ -6,6 +6,7 @@
         android:id="@+id/check_toolbar"
         android:checkable="true"
         android:title="Visible toolbar"
+        android:focusable="false"
         app:actionViewClass="android.widget.CheckBox"
         app:showAsAction="never" />
     <item

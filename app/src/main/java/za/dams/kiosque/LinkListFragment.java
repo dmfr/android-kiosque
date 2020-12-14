@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -37,6 +38,7 @@ public class LinkListFragment extends ListFragment
     private LinkListActionListener mListener ;
 
     public interface LinkListActionListener {
+        public void onLinkClick(int linkIdx) ;
         public void onLinkAdd() ;
         public void onLinkEdit(int linkIdx) ;
         public void onLinkDelete(int linkIdx) ;
@@ -74,6 +76,7 @@ public class LinkListFragment extends ListFragment
 
         registerForContextMenu(getListView());
     }
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -422,7 +425,9 @@ public class LinkListFragment extends ListFragment
     }
 
     private void onLinkClicked(LinksManager.LinkModel clickedLink) {
-
+        if( mListener != null ) {
+            mListener.onLinkClick(clickedLink.idx);
+        }
     }
 
 

@@ -27,7 +27,6 @@ public class SettingZoomFragment extends DialogFragment implements DialogInterfa
         mListener = l ;
     }
 
-    private static final String ARG_ZOOMFACTOR = "zoom_factor";
     private int mZoomFactor;
     private SeekBar mSeekBar ;
     private TextView mSeekTxt ;
@@ -38,20 +37,15 @@ public class SettingZoomFragment extends DialogFragment implements DialogInterfa
         // Required empty public constructor
     }
 
-    public static SettingZoomFragment newInstance(int zoomFactor) {
+    public static SettingZoomFragment newInstance() {
         SettingZoomFragment fragment = new SettingZoomFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_ZOOMFACTOR, zoomFactor);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mZoomFactor = getArguments().getInt(ARG_ZOOMFACTOR);
-        }
+        loadValue() ;
     }
 
     @Override
@@ -78,16 +72,11 @@ public class SettingZoomFragment extends DialogFragment implements DialogInterfa
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if( savedInstanceState != null ) {
-            // TODO : restore key-in values ?
-        } else {
-            loadValue() ;
-        }
+        applyValue();
     }
 
     private void loadValue() {
         mZoomFactor = SettingsManager.getZoomFactor(getActivity()) ;
-        applyValue() ;
     }
     private void applyValue() {
         mSeekBar.setProgress(mZoomFactor);
