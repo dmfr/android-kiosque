@@ -1,10 +1,12 @@
 package za.dams.kiosque;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -34,6 +37,8 @@ public class LinkListFragment extends ListFragment
 
     public interface LinkListActionListener {
         public void onLinkAdd() ;
+        public void onLinkEdit(int linkIdx) ;
+        public void onLinkDelete(int linkIdx) ;
     }
     public void setLinkListActionListener(LinkListFragment.LinkListActionListener listener) {
         mListener = listener ;
@@ -72,7 +77,7 @@ public class LinkListFragment extends ListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        mContext = getActivity() ;
         /*
         final String[] items = getResources().getStringArray(R.array.list_example);
         final ArrayAdapter<String> aa = new ArrayAdapter<String>(getActivity(),
@@ -127,12 +132,46 @@ public class LinkListFragment extends ListFragment
         }
     }
 
+    // https://stackoverflow.com/questions/26299035/fragmentpageradapter-and-its-fragment-contextmenu-issue
+    private int selectedItemIndex ;
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        selectedItemIndex = acmi.position;
+
         MenuInflater inflater = getActivity().getMenuInflater() ;
         inflater.inflate(R.menu.menu_links, menu);
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        LinksAdapter linksAdapter = (LinksAdapter)getListView().getAdapter() ;
+        LinksManager.LinkModel linkModel = linksAdapter.getItem(selectedItemIndex) ;
+        Log.w("DAMS","Item is = "+linkModel.idx) ;
+
+        if( mListener == null ) {
+            return super.onContextItemSelected(item) ;
+        }
+
+        switch( item.getItemId() ) {
+            case R.id.link_edit :
+                mListener.onLinkEdit(linkModel.idx);
+                break ;
+
+            case R.id.link_delete :
+                new AlertDialog.Builder(mContext)
+                        .setTitle("Confirm ?")
+                        .setMessage("Delete link = "+linkModel.name+" ?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                mListener.onLinkDelete(linkModel.idx);
+                            }})
+                        .setNegativeButton(android.R.string.no, null).show();
+        }
+
+        return super.onContextItemSelected(item) ;
     }
 
     private class LinksAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {

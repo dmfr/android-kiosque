@@ -16,6 +16,7 @@ public class LinksManager {
     public static final String SHARED_PREFS_KEY = "json_links" ;
 
     public static class LinkModel {
+        public int idx = -1 ;
         public String name ;
         public String urlBase ;
         public String urlParams ;
@@ -44,6 +45,7 @@ public class LinksManager {
                 JSONObject objectInArray = jsonArray.getJSONObject(i);
 
                 LinkModel lm = new LinkModel() ;
+                lm.idx = i ;
                 lm.name = objectInArray.getString("name");
                 lm.urlBase = objectInArray.getString("urlBase");
                 lm.urlParams = objectInArray.getString("urlParams");
@@ -81,10 +83,17 @@ public class LinksManager {
     }
     public static void storeLinkAtIdx( Context context, LinkModel linkModel, int linkIdx ) {
         List<LinkModel> list = getLinks(context) ;
-        if( linkIdx > 0 && list.size() >= linkIdx + 1 ) {
+        if( linkIdx >= 0 && list.size() >= linkIdx + 1 ) {
             list.set(linkIdx,linkModel) ;
         } else {
             list.add(linkModel) ;
+        }
+        storeLinks(context,list) ;
+    }
+    public static void deleteLinkAtIdx( Context context, int linkIdx ) {
+        List<LinkModel> list = getLinks(context) ;
+        if( linkIdx >= 0 && list.size() >= linkIdx + 1 ) {
+            list.remove(linkIdx) ;
         }
         storeLinks(context,list) ;
     }

@@ -30,6 +30,8 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Toolbar;
 
+import za.dams.kiosque.util.LinksManager;
+
 
 public class MainActivity extends Activity
 implements FirstFragment.OnButtonClickedListener
@@ -318,5 +320,36 @@ implements FirstFragment.OnButtonClickedListener
             newFragment.setTargetFragment(currentBackStackFragment,LinkAddFragment.REQUEST_CODE);
         }
         newFragment.show(ft, "dialog");
+    }
+
+    @Override
+    public void onLinkEdit(int linkIdx) {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
+        LinkAddFragment newFragment = LinkAddFragment.newInstance(linkIdx);
+        if( currentBackStackFragment instanceof LinkListFragment ) {
+            newFragment.setTargetFragment(currentBackStackFragment,LinkAddFragment.REQUEST_CODE);
+        }
+        newFragment.show(ft, "dialog");
+    }
+
+    @Override
+    public void onLinkDelete(int linkIdx) {
+        LinksManager.deleteLinkAtIdx(this,linkIdx);
+
+        // Create and show the dialog.
+        Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
+        LinkAddFragment newFragment = LinkAddFragment.newInstance(linkIdx);
+        if( currentBackStackFragment instanceof LinkListFragment ) {
+            // HACK to force reload (through ActivityResult)?
+            currentBackStackFragment.onActivityResult(LinkAddFragment.REQUEST_CODE,LinkAddFragment.RESULT_SAVED,null);
+        }
     }
 }
