@@ -313,7 +313,7 @@ implements FirstFragment.OnButtonClickedListener
 
         // Create and show the dialog.
         Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
-        LinkAddFragment newFragment = LinkAddFragment.newInstance(0);
+        LinkAddFragment newFragment = LinkAddFragment.newInstance(-1);
         if( currentBackStackFragment instanceof LinkListFragment ) {
             newFragment.setTargetFragment(currentBackStackFragment,LinkAddFragment.REQUEST_CODE);
         }

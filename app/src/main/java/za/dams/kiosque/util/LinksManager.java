@@ -21,7 +21,7 @@ public class LinksManager {
         public String urlParams ;
         public boolean isProd ;
         public String getUrl() {
-            return urlBase+'?'+urlParams ;
+            return urlParams.length()> 0 ? urlBase+'?'+urlParams : urlBase ;
         }
     }
 

@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.URLUtil;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
@@ -18,7 +20,8 @@ import androidx.annotation.Nullable;
 
 import za.dams.kiosque.util.LinksManager;
 
-public class LinkAddFragment extends DialogFragment implements DialogInterface.OnClickListener {
+public class LinkAddFragment extends DialogFragment
+        implements DialogInterface.OnClickListener, View.OnClickListener {
     public static final int REQUEST_CODE = 1 ;
     public static final int RESULT_SAVED = 1 ;
     private static final String ARG_LINKIDX = "link_idx";
@@ -30,6 +33,7 @@ public class LinkAddFragment extends DialogFragment implements DialogInterface.O
     private TextView mTxtUrlBase ;
     private TextView mTxtUrlParams ;
     private CheckBox mChkIsProd ;
+    private Button mBtnPositive ;
 
     public static LinkAddFragment newInstance(int linkIdx) {
         LinkAddFragment fragment = new LinkAddFragment();
@@ -56,7 +60,7 @@ public class LinkAddFragment extends DialogFragment implements DialogInterface.O
         }
     }
 
-    private void loadModel() {
+    private boolean loadModel() {
         if( mLinkIdx >= 0 ) {
             mModel = LinksManager.getLinkByIdx(getActivity(), mLinkIdx);
         }
@@ -64,22 +68,40 @@ public class LinkAddFragment extends DialogFragment implements DialogInterface.O
             mModel = new LinksManager.LinkModel() ;
         }
         modelToFields() ;
+        return true ;
     }
-    private void modelToFields() {
+    private boolean modelToFields() {
         mTxtName.setText(mModel.name);
         mTxtUrlBase.setText(mModel.urlBase);
         mTxtUrlParams.setText(mModel.urlParams);
         mChkIsProd.setChecked(mModel.isProd);
+        return true ;
     }
-    private void saveModel() {
-        fieldsToModel();
+    private boolean saveModel() {
+        if( !fieldsToModel() ) {
+            return false ;
+        }
         LinksManager.storeLinkAtIdx(getActivity(), mModel, mLinkIdx);
+        return true ;
     }
-    private void fieldsToModel() {
+    private boolean fieldsToModel() {
+        boolean hasErrors = false ;
+        if(  !URLUtil.isValidUrl(mTxtUrlBase.getText().toString().trim()) ) {
+            mTxtUrlBase.setError("Must be valid URL");
+            hasErrors = true ;
+        }
+        if( mTxtName.getText().toString().trim().length() < 4 ) {
+            mTxtName.setError("Name empty/incorrect");
+            hasErrors = true ;
+        }
+        if( hasErrors ) {
+            return false ;
+        }
         mModel.name = mTxtName.getText().toString().trim() ;
         mModel.urlBase = mTxtUrlBase.getText().toString().trim() ;
         mModel.urlParams = mTxtUrlParams.getText().toString().trim() ;
         mModel.isProd = mChkIsProd.isChecked() ;
+        return true ;
     }
 
     @Override
@@ -103,6 +125,10 @@ public class LinkAddFragment extends DialogFragment implements DialogInterface.O
     public void onResume() {
         super.onResume();
 
+        final AlertDialog d = (AlertDialog)getDialog();
+        mBtnPositive = (Button) d.getButton(Dialog.BUTTON_POSITIVE);
+        mBtnPositive.setOnClickListener(this);
+
         Window window = getDialog().getWindow();
         if(window == null) return;
         WindowManager.LayoutParams params = window.getAttributes();
@@ -114,6 +140,8 @@ public class LinkAddFragment extends DialogFragment implements DialogInterface.O
 
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
+        return ;
+        /*
         switch( i ) {
             case DialogInterface.BUTTON_POSITIVE :
                 if( getTargetFragment() != null ) {
@@ -126,6 +154,21 @@ public class LinkAddFragment extends DialogFragment implements DialogInterface.O
             case DialogInterface.BUTTON_NEGATIVE :
                 Log.w("DAMS","BUTTON_NEGATIVE");
                 break ;
+        }
+         */
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        // https://stackoverflow.com/questions/2620444/how-to-prevent-a-dialog-from-closing-when-a-button-is-clicked/9523257
+        if( view == mBtnPositive ) {
+            if( saveModel() == true ) {
+                if( getTargetFragment() != null ) {
+                    getTargetFragment().onActivityResult(getTargetRequestCode(),RESULT_SAVED,null);
+                }
+                getDialog().dismiss();
+            }
         }
     }
 }

@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -63,6 +65,8 @@ public class LinkListFragment extends ListFragment
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(this);
         mFab = fab ;
+
+        registerForContextMenu(getListView());
     }
 
     @Override
@@ -123,9 +127,17 @@ public class LinkListFragment extends ListFragment
         }
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater() ;
+        inflater.inflate(R.menu.menu_links, menu);
+    }
+
     private class LinksAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
 
-        private static final String TAG = "Settings/AccountSubscribeAdapter";
+        private static final String TAG = "LinksAdapter";
 
         private LayoutInflater mInflater;
         private static final int LAYOUT = R.layout.fragment_linkslist_item;
