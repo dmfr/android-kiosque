@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -256,6 +257,11 @@ public class LinkListFragment extends ListFragment
 
             setText(view, R.id.item_title, linkModel.name);
             setText(view, R.id.item_caption, linkModel.getUrl());
+
+            View colorView = view.findViewById(R.id.color);
+            int color = getResources().getColor( linkModel.isProd ? android.R.color.holo_green_light : R.color.grey ) ;
+            colorView.setBackgroundColor( color );
+
             return view;
         }
         private void setText(View view, int id, String text) {
