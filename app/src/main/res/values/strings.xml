@@ -11,4 +11,7 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="activity_intent_filter_action">za.dams.kiosque.SCAN</string>
+    <string name="datawedge_intent_key_data">com.symbol.datawedge.data_string</string>
 </resources>

@@ -11,7 +11,10 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -75,6 +78,19 @@ implements FirstFragment.OnButtonClickedListener
 
 
         updateUI();
+
+
+        IntentFilter filter = new IntentFilter();
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        filter.addAction(getResources().getString(R.string.activity_intent_filter_action));
+        registerReceiver(myBroadcastReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        unregisterReceiver(myBroadcastReceiver);
     }
 
     @Override
@@ -389,4 +405,24 @@ implements FirstFragment.OnButtonClickedListener
         }
 
     }
+
+
+
+
+    private BroadcastReceiver myBroadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Bundle b = intent.getExtras();
+
+            if (action.equals(getResources().getString(R.string.activity_intent_filter_action))) {
+                String decodedData = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_data));
+                Log.w("DAMS",decodedData) ;
+                try {
+                    onScanResult(decodedData) ;
+                } catch (Exception e) {}
+            }
+        }
+    };
 }
