@@ -59,4 +59,11 @@
             android:duplicateParentState="true" />
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/imgbutton"
+        android:layout_width="64dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+         android:background="?android:selectableItemBackground" />
+
 </LinearLayout>

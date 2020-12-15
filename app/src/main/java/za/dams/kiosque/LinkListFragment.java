@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -264,6 +265,20 @@ public class LinkListFragment extends ListFragment
             View colorView = view.findViewById(R.id.color);
             int color = getResources().getColor( linkModel.isProd ? android.R.color.holo_green_light : R.color.grey ) ;
             colorView.setBackgroundColor( color );
+
+            ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
+
+            imgbtn.setVisibility(View.GONE);
+            /*
+            imgbtn.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_more));
+            imgbtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((ViewGroup)view).showContextMenu();
+                }
+            });
+             */
+
 
             return view;
         }
