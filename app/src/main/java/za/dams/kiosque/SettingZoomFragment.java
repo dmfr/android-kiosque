@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -43,12 +44,6 @@ public class SettingZoomFragment extends DialogFragment implements DialogInterfa
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        loadValue() ;
-    }
-
-    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View v = getActivity().getLayoutInflater().inflate(R.layout.fragment_setting_zoom, null, false);
         mSeekBar = (SeekBar)v.findViewById(R.id.seek_bar) ;
@@ -65,14 +60,16 @@ public class SettingZoomFragment extends DialogFragment implements DialogInterfa
     @Override
     public void onResume() {
         super.onResume();
-
         mSeekBar.setOnSeekBarChangeListener(this);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        loadValue() ;
         super.onActivityCreated(savedInstanceState);
-        applyValue();
+        if( savedInstanceState == null ) {
+            applyValue() ;
+        }
     }
 
     private void loadValue() {

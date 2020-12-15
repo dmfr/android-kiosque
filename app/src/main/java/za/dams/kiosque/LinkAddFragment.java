@@ -21,7 +21,7 @@ import androidx.annotation.Nullable;
 import za.dams.kiosque.util.LinksManager;
 
 public class LinkAddFragment extends DialogFragment
-        implements DialogInterface.OnClickListener, View.OnClickListener {
+        implements View.OnClickListener {
     public static final int REQUEST_CODE = 1 ;
     public static final int RESULT_SAVED = 1 ;
     private static final String ARG_LINKIDX = "link_idx";
@@ -48,16 +48,14 @@ public class LinkAddFragment extends DialogFragment
         if (getArguments() != null) {
             mLinkIdx = getArguments().getInt(ARG_LINKIDX);
         }
-        loadModel() ;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        loadModel() ;
         super.onActivityCreated(savedInstanceState);
-        if( savedInstanceState != null ) {
-            // TODO : restore key-in values ?
-        } else {
-            modelToFields() ;
+        if( savedInstanceState == null ) {
+            modelToFields();
         }
     }
 
@@ -68,7 +66,6 @@ public class LinkAddFragment extends DialogFragment
         if( mModel == null ){
             mModel = new LinksManager.LinkModel() ;
         }
-        //modelToFields() ;
         return true ;
     }
     private boolean modelToFields() {
@@ -78,7 +75,8 @@ public class LinkAddFragment extends DialogFragment
         mChkIsProd.setChecked(mModel.isProd);
         return true ;
     }
-    private boolean saveModel() {
+
+    private boolean handleSave() {
         if( !fieldsToModel() ) {
             return false ;
         }
@@ -117,8 +115,8 @@ public class LinkAddFragment extends DialogFragment
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit link");
         builder.setView(v);
-        builder.setNegativeButton("Cancel", this);
-        builder.setPositiveButton("Save", this);
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Save", null);
         return builder.show();
     }
 
@@ -140,31 +138,10 @@ public class LinkAddFragment extends DialogFragment
 
 
     @Override
-    public void onClick(DialogInterface dialogInterface, int i) {
-        return ;
-        /*
-        switch( i ) {
-            case DialogInterface.BUTTON_POSITIVE :
-                if( getTargetFragment() != null ) {
-                    getTargetFragment().onActivityResult(getTargetRequestCode(),RESULT_SAVED,null);
-                }
-                saveModel() ;
-                Log.w("DAMS","BUTTON_POSITIVE");
-                break ;
-
-            case DialogInterface.BUTTON_NEGATIVE :
-                Log.w("DAMS","BUTTON_NEGATIVE");
-                break ;
-        }
-         */
-    }
-
-
-    @Override
     public void onClick(View view) {
         // https://stackoverflow.com/questions/2620444/how-to-prevent-a-dialog-from-closing-when-a-button-is-clicked/9523257
         if( view == mBtnPositive ) {
-            if( saveModel() == true ) {
+            if( handleSave() == true ) {
                 if( getTargetFragment() != null ) {
                     getTargetFragment().onActivityResult(getTargetRequestCode(),RESULT_SAVED,null);
                 }
