@@ -15,13 +15,8 @@
         android:title="Zoom factor"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_barcode"
+        android:id="@+id/action_zxing"
         android:orderInCategory="100"
-        android:title="Scan barcode"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_fragment"
-        android:orderInCategory="100"
-        android:title="Scan fragment"
+        android:title="Barcode from camera"
         app:showAsAction="never" />
 </menu>

@@ -140,10 +140,7 @@ implements FirstFragment.OnButtonClickedListener
         if (id == R.id.action_setting_zoom) {
             openSettingZoom() ;
         }
-        if (id == R.id.action_barcode) {
-            scanBarcode();
-        }
-        if (id == R.id.action_fragment) {
+        if (id == R.id.action_zxing) {
             scanFragment();
         }
 
