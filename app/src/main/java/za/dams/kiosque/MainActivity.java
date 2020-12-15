@@ -8,11 +8,13 @@ package za.dams.kiosque;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Rect;
@@ -52,6 +54,26 @@ implements FirstFragment.OnButtonClickedListener
     };
 
     private MenuItem mCheckToolbar ;
+
+    @Override
+    public void onBackPressed() {
+        Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
+        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof SecondFragment) ;
+        if( isWebSession ) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirmation")
+                    .setMessage("Quit web session ?")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                           MainActivity.super.onBackPressed();
+                        }})
+                    .setNegativeButton(android.R.string.no, null).show();
+            return ;
+        }
+        super.onBackPressed();
+    }
 
     @SuppressLint("NewApi")
     @Override
