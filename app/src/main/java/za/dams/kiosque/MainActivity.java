@@ -34,6 +34,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import za.dams.kiosque.util.LinksManager;
@@ -355,6 +356,8 @@ implements FirstFragment.OnButtonClickedListener
         if( isWebSession ) {
             WebFragment sf = (WebFragment)currentBackStackFragment ;
             sf.pushScanResult(scanResult);
+        } else {
+            Toast.makeText(this, "Scan : "+scanResult, Toast.LENGTH_SHORT).show();
         }
     }
 
