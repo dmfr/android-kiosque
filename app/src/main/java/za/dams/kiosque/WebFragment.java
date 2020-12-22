@@ -1,7 +1,6 @@
 package za.dams.kiosque;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -20,7 +19,7 @@ import androidx.annotation.Nullable;
 import za.dams.kiosque.util.SettingsManager;
 
 
-public class SecondFragment extends Fragment {
+public class WebFragment extends Fragment {
     private Activity mActivity ;
     private WebView mWebView;
     private ImageView mloadingView;
@@ -28,11 +27,11 @@ public class SecondFragment extends Fragment {
     private static final String ARG_URL = "url";
     private String mUrl;
 
-    public SecondFragment() {
+    public WebFragment() {
         // Required empty public constructor
     }
-    public static SecondFragment newInstance(String url) {
-        SecondFragment fragment = new SecondFragment();
+    public static WebFragment newInstance(String url) {
+        WebFragment fragment = new WebFragment();
         Bundle args = new Bundle();
         args.putString(ARG_URL, url);
         fragment.setArguments(args);

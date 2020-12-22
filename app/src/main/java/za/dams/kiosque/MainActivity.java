@@ -59,7 +59,7 @@ implements FirstFragment.OnButtonClickedListener
     @Override
     public void onBackPressed() {
         Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
-        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof SecondFragment) ;
+        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof WebFragment) ;
         if( isWebSession ) {
             new AlertDialog.Builder(this)
                     .setTitle("Confirmation")
@@ -172,7 +172,7 @@ implements FirstFragment.OnButtonClickedListener
     @Override
     public void onButtonClicked(View clickedButton) {
         Log.w("DAMS","fragment button cliquer") ;
-        SecondFragment firstFrag = new SecondFragment() ;
+        WebFragment firstFrag = new WebFragment() ;
 
         FragmentTransaction ft = getFragmentManager().beginTransaction() ;
         ft.replace(R.id.fragment_container, (Fragment)firstFrag,"visible_fragment");
@@ -204,7 +204,7 @@ implements FirstFragment.OnButtonClickedListener
     }
     private void updateUI() {
         Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
-        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof SecondFragment) ;
+        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof WebFragment) ;
 
 
         if( isWebSession ) {
@@ -351,16 +351,16 @@ implements FirstFragment.OnButtonClickedListener
     public void onScanResult(String scanResult) {
         Log.w("DAMS","Scan result = "+scanResult);
         Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
-        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof SecondFragment) ;
+        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof WebFragment) ;
         if( isWebSession ) {
-            SecondFragment sf = (SecondFragment)currentBackStackFragment ;
+            WebFragment sf = (WebFragment)currentBackStackFragment ;
             sf.pushScanResult(scanResult);
         }
     }
 
     @Override
     public void onLinkClick(int linkIdx) {
-        SecondFragment firstFrag = SecondFragment.newInstance( LinksManager.getLinkByIdx(this,linkIdx).getUrl() ) ;
+        WebFragment firstFrag = WebFragment.newInstance( LinksManager.getLinkByIdx(this,linkIdx).getUrl() ) ;
 
         FragmentTransaction ft = getFragmentManager().beginTransaction() ;
         ft.replace(R.id.fragment_container, (Fragment)firstFrag,"visible_fragment");
@@ -422,7 +422,7 @@ implements FirstFragment.OnButtonClickedListener
     public void onZoomFactorChanged(int zoomFactor) {
         // Create and show the dialog.
         Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
-        if( currentBackStackFragment instanceof SecondFragment ) {
+        if( currentBackStackFragment instanceof WebFragment) {
             //((SecondFragment)currentBackStackFragment).applyZoomFactor() ;
         }
 
