@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -208,8 +209,10 @@ implements FirstFragment.OnButtonClickedListener
 
         if( isWebSession ) {
             hideSystemUI() ;
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             showSystemUI() ;
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         }
     }
     private void showSystemUI() {
