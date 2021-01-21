@@ -19,4 +19,9 @@
         android:orderInCategory="100"
         android:title="Barcode from camera"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_signature"
+        android:orderInCategory="100"
+        android:title="Signature"
+        app:showAsAction="never" />
 </menu>
