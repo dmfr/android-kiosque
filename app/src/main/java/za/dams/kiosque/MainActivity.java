@@ -54,6 +54,7 @@ implements FirstFragment.OnButtonClickedListener
             updateUI();
         }
     };
+    boolean mKeyboardVisible ;
 
     private MenuItem mCheckToolbar ;
 
@@ -215,7 +216,11 @@ implements FirstFragment.OnButtonClickedListener
 
 
         if( isWebSession ) {
-            hideSystemUI() ;
+            if( mKeyboardVisible ) {
+                showSystemUI(false) ;
+            } else {
+                hideSystemUI();
+            }
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             showSystemUI() ;
@@ -223,12 +228,17 @@ implements FirstFragment.OnButtonClickedListener
         }
     }
     private void showSystemUI() {
+        showSystemUI(true);
+    }
+    private void showSystemUI(boolean showActionBar) {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         getWindow().getDecorView().setSystemUiVisibility(0);
 
-        ActionBar actionBar = getActionBar();
-        actionBar.show();
+        if( showActionBar ) {
+            ActionBar actionBar = getActionBar();
+            actionBar.show();
+        }
     }
     private void hideSystemUI() {
         // Prevent actionbar from disabling fullscreen
@@ -280,8 +290,9 @@ implements FirstFragment.OnButtonClickedListener
         });
     }
     public void onKeyboardVisibilityChanged(boolean visible) {
-        Log.w("dams","keybord visible = "+visible) ;
-        if( !visible ) {
+        //Log.w("dams","keybord visible = "+visible) ;
+        if( true ) {
+            mKeyboardVisible = visible ;
             delayedUpdateUI(300);
         }
     }
