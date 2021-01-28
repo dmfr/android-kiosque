@@ -147,7 +147,7 @@ public class SignatureFragment extends DialogFragment implements SignaturePad.On
     @Override
     public void onClick(View view) {
         if( view==mSaveButton ) {
-            Log.w("DAMS","Signed") ;
+            //Log.w("DAMS","Signed") ;
             Bitmap signature = mSignaturePad.getSignatureBitmap() ;
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

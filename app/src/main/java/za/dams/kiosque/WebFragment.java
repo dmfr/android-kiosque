@@ -43,7 +43,7 @@ public class WebFragment extends Fragment {
 
         @JavascriptInterface
         public void signatureOpen() {
-            Log.w("DAMS","WebAppInterface signatureOpen") ;
+            //Log.w("DAMS","WebAppInterface signatureOpen") ;
             WebFragment.this.signatureOpen() ;
         }
     }
@@ -151,19 +151,19 @@ public class WebFragment extends Fragment {
     }
 
     public void pushScanResult(String scanResult) {
-        Log.w("DAMS","pushScanResult = "+scanResult) ;
+        //Log.w("DAMS","pushScanResult = "+scanResult) ;
         final String javaEvent = "scan" ;
         mWebView.loadUrl("javascript:postFromJava(\""+javaEvent+"\",\""+scanResult+"\")");
     }
     public void pushSignature(String imgJpegBase64) {
-        Log.w("DAMS","pushSignature = "+imgJpegBase64) ;
+        //Log.w("DAMS","pushSignature = "+imgJpegBase64) ;
         final String javaEvent = "sign_result" ;
         mWebView.loadUrl("javascript:postFromJava(\""+javaEvent+"\",\""+imgJpegBase64+"\")");
     }
 
 
     private void signatureOpen() {
-        Log.w("DAMS","WebGragment signatureOpen") ;
+        //Log.w("DAMS","WebGragment signatureOpen") ;
         if( mListener != null ) {
             mListener.onSignatureOpen() ;
         }

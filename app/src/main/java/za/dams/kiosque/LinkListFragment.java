@@ -152,7 +152,7 @@ public class LinkListFragment extends ListFragment
     public boolean onContextItemSelected(MenuItem item) {
         LinksAdapter linksAdapter = (LinksAdapter)getListView().getAdapter() ;
         LinksManager.LinkModel linkModel = linksAdapter.getItem(selectedItemIndex) ;
-        Log.w("DAMS","Item is = "+linkModel.idx) ;
+        //Log.w("DAMS","Item is = "+linkModel.idx) ;
 
         if( mListener == null ) {
             return super.onContextItemSelected(item) ;
