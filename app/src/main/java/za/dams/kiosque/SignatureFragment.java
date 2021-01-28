@@ -134,7 +134,6 @@ public class SignatureFragment extends DialogFragment implements SignaturePad.On
     @Override
     public void onSigned() {
         //Event triggered when the pad is signed
-        Log.w("DAMS","Signed !!!!!!!");
     }
 
     @Override
