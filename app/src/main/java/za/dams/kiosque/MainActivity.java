@@ -95,7 +95,7 @@ implements FirstFragment.OnButtonClickedListener
             FragmentTransaction ft = getFragmentManager().beginTransaction() ;
             ft.add(R.id.fragment_container, (Fragment)firstFrag, "visible_fragment");
             ft.commit();
-            Log.w("DAMS","Adding fragment") ;
+            //Log.w("DAMS","Adding fragment") ;
         }
 
         // Restore Fullscreen on keyboard hide
@@ -156,7 +156,7 @@ implements FirstFragment.OnButtonClickedListener
     @Override
     public void onAttachFragment(Fragment fragment) {
         // https://medium.com/better-programming/proper-fragment-communication-in-android-489fcac520b0
-        Log.w("DAMS","atacched fragment");
+        //Log.w("DAMS","atacched fragment");
         if( fragment instanceof FirstFragment) {
             ((FirstFragment) fragment).setOnButtonClickedListener(this);
         }
@@ -281,7 +281,7 @@ implements FirstFragment.OnButtonClickedListener
                 boolean isShown = heightDiff >= estimatedKeyboardHeight;
 
                 if (isShown == alreadyOpen) {
-                    Log.i("Keyboard state", "Ignoring global layout change...");
+                    //Log.i("Keyboard state", "Ignoring global layout change...");
                     return;
                 }
                 alreadyOpen = isShown;
@@ -290,7 +290,6 @@ implements FirstFragment.OnButtonClickedListener
         });
     }
     public void onKeyboardVisibilityChanged(boolean visible) {
-        //Log.w("dams","keybord visible = "+visible) ;
         if( true ) {
             mKeyboardVisible = visible ;
             delayedUpdateUI(300);
@@ -383,7 +382,7 @@ implements FirstFragment.OnButtonClickedListener
 
     @Override
     public void onScanResult(String scanResult) {
-        Log.w("DAMS","Scan result = "+scanResult);
+        //Log.w("DAMS","Scan result = "+scanResult);
         Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
         boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof WebFragment) ;
         if( isWebSession ) {
@@ -476,7 +475,7 @@ implements FirstFragment.OnButtonClickedListener
 
             if (action.equals(getResources().getString(R.string.activity_intent_filter_action))) {
                 String decodedData = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_data));
-                Log.w("DAMS",decodedData) ;
+                //Log.w("DAMS",decodedData) ;
                 try {
                     onScanResult(decodedData) ;
                 } catch (Exception e) {}
