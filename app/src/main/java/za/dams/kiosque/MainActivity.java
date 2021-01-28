@@ -41,8 +41,7 @@ import za.dams.kiosque.util.LinksManager;
 
 
 public class MainActivity extends Activity
-implements FirstFragment.OnButtonClickedListener
-        , FragmentManager.OnBackStackChangedListener
+implements FragmentManager.OnBackStackChangedListener
         , ScanFragment.ScanListener
         , LinkListFragment.LinkListActionListener
         , SettingZoomFragment.OnZoomFactorChangerListener
@@ -157,9 +156,6 @@ implements FirstFragment.OnButtonClickedListener
     public void onAttachFragment(Fragment fragment) {
         // https://medium.com/better-programming/proper-fragment-communication-in-android-489fcac520b0
         //Log.w("DAMS","atacched fragment");
-        if( fragment instanceof FirstFragment) {
-            ((FirstFragment) fragment).setOnButtonClickedListener(this);
-        }
         if( fragment instanceof ScanFragment ) {
             ((ScanFragment) fragment).setListener(this);
         }
@@ -177,30 +173,12 @@ implements FirstFragment.OnButtonClickedListener
         }
     }
 
-    @Override
-    public void onButtonClicked(View clickedButton) {
-        Log.w("DAMS","fragment button cliquer") ;
-        WebFragment firstFrag = new WebFragment() ;
-
-        FragmentTransaction ft = getFragmentManager().beginTransaction() ;
-        ft.replace(R.id.fragment_container, (Fragment)firstFrag,"visible_fragment");
-        ft.addToBackStack(null);
-        //ft.addOnBackStackChangedListener(this) ;
-        ft.commit();
-        Log.w("DAMS","Adding fragment") ;
-    }
 
 
-
-
-    private void startWebSession(){
-        // hide system bar
-    }
 
     @Override
     public void onBackStackChanged() {
         updateUI();
-
     }
 
 
@@ -314,21 +292,6 @@ implements FirstFragment.OnButtonClickedListener
 
 
 
-
-    public void scanBarcode() {
-        Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-        intent.setPackage("com.google.zxing.client.android");
-        startActivityForResult(intent, 0);
-    }
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == 0) {
-            if (resultCode == RESULT_OK) {
-                //here is where you get your result
-                String barcode = intent.getStringExtra("SCAN_RESULT");
-                Log.w("DAMS","scanned = "+barcode) ;
-            }
-        }
-    }
 
 
     public void openSettingZoom() {
