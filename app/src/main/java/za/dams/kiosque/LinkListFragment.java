@@ -104,7 +104,7 @@ public class LinkListFragment extends ListFragment
     }
 
     public void setListShown(boolean torf) {
-        Log.w("DAMS","Set list shown = "+torf);
+        //Log.w("DAMS","Set list shown = "+torf);
         mListContainer.setVisibility( torf ? View.VISIBLE : View.GONE );
         mProgressContainer.setVisibility( !torf ? View.VISIBLE : View.GONE );
     }
