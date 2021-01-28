@@ -3,16 +3,20 @@ package za.dams.kiosque;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -20,9 +24,36 @@ import za.dams.kiosque.util.SettingsManager;
 
 
 public class WebFragment extends Fragment {
+    public interface WebListener {
+        void onSignatureOpen();
+    }
+    public class WebAppInterface {
+        Context mContext;
+
+        /** Instantiate the interface and set the context */
+        WebAppInterface(Context c) {
+            mContext = c;
+        }
+
+        /** Show a toast from the web page */
+        @JavascriptInterface
+        public void showToast(String toast) {
+            Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
+        }
+
+        @JavascriptInterface
+        public void signatureOpen() {
+            Log.w("DAMS","WebAppInterface signatureOpen") ;
+            WebFragment.this.signatureOpen() ;
+        }
+    }
+
+
     private Activity mActivity ;
     private WebView mWebView;
     private ImageView mloadingView;
+
+    private WebListener mListener ;
 
     private static final String ARG_URL = "url";
     private String mUrl;
@@ -38,6 +69,9 @@ public class WebFragment extends Fragment {
         return fragment;
     }
 
+    public void setListener( WebListener wl ) {
+        mListener = wl ;
+    }
 
     @SuppressLint("NewApi")
     @Override
@@ -105,6 +139,16 @@ public class WebFragment extends Fragment {
         mActivity = getActivity() ;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mWebView.addJavascriptInterface(new WebAppInterface(mActivity), "Android");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     public void pushScanResult(String scanResult) {
         Log.w("DAMS","pushScanResult = "+scanResult) ;
@@ -113,7 +157,15 @@ public class WebFragment extends Fragment {
     }
     public void pushSignature(String imgJpegBase64) {
         Log.w("DAMS","pushSignature = "+imgJpegBase64) ;
-        final String javaEvent = "signature" ;
+        final String javaEvent = "sign_result" ;
         mWebView.loadUrl("javascript:postFromJava(\""+javaEvent+"\",\""+imgJpegBase64+"\")");
+    }
+
+
+    private void signatureOpen() {
+        Log.w("DAMS","WebGragment signatureOpen") ;
+        if( mListener != null ) {
+            mListener.onSignatureOpen() ;
+        }
     }
 }

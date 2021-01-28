@@ -46,6 +46,7 @@ implements FragmentManager.OnBackStackChangedListener
         , SignatureFragment.SignatureListener
         , LinkListFragment.LinkListActionListener
         , SettingZoomFragment.OnZoomFactorChangerListener
+        , WebFragment.WebListener
 {
 
     private final Handler mUpdateUiHandler = new Handler() {
@@ -171,6 +172,9 @@ implements FragmentManager.OnBackStackChangedListener
         }
         if( fragment instanceof SettingZoomFragment ) {
             ((SettingZoomFragment)fragment).setListener(this);
+        }
+        if( fragment instanceof WebFragment ) {
+            ((WebFragment)fragment).setListener(this) ;
         }
     }
 
@@ -459,4 +463,9 @@ implements FragmentManager.OnBackStackChangedListener
             }
         }
     };
+
+    @Override
+    public void onSignatureOpen() {
+        signatureFragment();
+    }
 }
