@@ -111,7 +111,9 @@ public class WebFragment extends Fragment {
         final String javaEvent = "scan" ;
         mWebView.loadUrl("javascript:postFromJava(\""+javaEvent+"\",\""+scanResult+"\")");
     }
-
-
-
+    public void pushSignature(String imgJpegBase64) {
+        Log.w("DAMS","pushSignature = "+imgJpegBase64) ;
+        final String javaEvent = "signature" ;
+        mWebView.loadUrl("javascript:postFromJava(\""+javaEvent+"\",\""+imgJpegBase64+"\")");
+    }
 }

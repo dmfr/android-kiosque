@@ -43,6 +43,7 @@ import za.dams.kiosque.util.LinksManager;
 public class MainActivity extends Activity
 implements FragmentManager.OnBackStackChangedListener
         , ScanFragment.ScanListener
+        , SignatureFragment.SignatureListener
         , LinkListFragment.LinkListActionListener
         , SettingZoomFragment.OnZoomFactorChangerListener
 {
@@ -160,7 +161,7 @@ implements FragmentManager.OnBackStackChangedListener
             ((ScanFragment) fragment).setListener(this);
         }
         if( fragment instanceof SignatureFragment ) {
-           // ((SignatureFragment) fragment).setListener(this);
+            ((SignatureFragment) fragment).setListener(this);
         }
         if( fragment instanceof LinkListFragment ) {
             ((LinkListFragment) fragment).setLinkListActionListener(this);
@@ -353,6 +354,19 @@ implements FragmentManager.OnBackStackChangedListener
             sf.pushScanResult(scanResult);
         } else {
             Toast.makeText(this, "Scan : "+scanResult, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onSignatureResult(String imgJpegBase64) {
+        //Log.w("DAMS","Scan result = "+scanResult);
+        Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
+        boolean isWebSession = (currentBackStackFragment != null && currentBackStackFragment instanceof WebFragment) ;
+        if( isWebSession ) {
+            WebFragment sf = (WebFragment)currentBackStackFragment ;
+            sf.pushSignature(imgJpegBase64);
+        } else {
+            Toast.makeText(this, "Signature : "+imgJpegBase64, Toast.LENGTH_SHORT).show();
         }
     }
 

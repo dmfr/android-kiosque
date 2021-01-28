@@ -10,12 +10,18 @@
     tools:context="za.dams.kiosque.ScanFragment"
     android:orientation="vertical">
 
+    <TextView android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Signature Pad"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <com.github.gcacace.signaturepad.views.SignaturePad
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:id="@+id/signaturePad"/>
+        android:id="@+id/signature_pad"/>
 
     <LinearLayout
         android:layout_width="match_parent"
