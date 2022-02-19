@@ -455,7 +455,16 @@ implements FragmentManager.OnBackStackChangedListener
             Bundle b = intent.getExtras();
 
             if (action.equals(getResources().getString(R.string.activity_intent_filter_action))) {
-                String decodedData = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_data));
+                /*
+                Log.w("DAMS",intent.getExtras().toString());
+                for (String key : intent.getExtras().keySet())
+                {
+                    Log.d("Bundle Debug", key + " = \"" + intent.getExtras().get(key) + "\"");
+                }
+                 */
+
+                //String decodedData = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_data));
+                String decodedData = intent.getStringExtra("data");
                 //Log.w("DAMS",decodedData) ;
                 try {
                     onScanResult(decodedData) ;
