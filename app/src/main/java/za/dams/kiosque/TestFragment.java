@@ -1,12 +1,17 @@
 package za.dams.kiosque;
 
+import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
+import android.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,7 +19,6 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class TestFragment extends Fragment {
-
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -23,6 +27,10 @@ public class TestFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private LayoutInflater mInflater ;
+
+    ViewGroup mListView ;
 
     public TestFragment() {
         // Required empty public constructor
@@ -56,9 +64,66 @@ public class TestFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mInflater = (LayoutInflater) getActivity().getLayoutInflater();
+        fillList();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_test, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        mListView = (ViewGroup) view.findViewById(R.id.listview) ;
+
+
+    }
+
+    private void fillList() {
+        if( mInflater == null ) {
+            Log.w("DAMS","Layout is null") ;
+        } else {
+            Log.w("DAMS","Layout OK");
+        }
+
+
+        for( int a=0 ; a<10 ; a++) {
+            View view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
+
+
+            //view.setTag(linkModel);
+
+            setText(view, R.id.item_title, "Tagda pouet");
+            setText(view, R.id.item_caption, "ceci est un lien");
+
+            View colorView = view.findViewById(R.id.color);
+            int color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
+            colorView.setBackgroundColor( color );
+
+            ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
+
+            imgbtn.setVisibility(View.GONE);
+            /*
+            imgbtn.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_more));
+            imgbtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((ViewGroup)view).showContextMenu();
+                }
+            });
+             */
+
+
+            mListView.addView(view);
+        }
+    }
+    private void setText(View view, int id, String text) {
+        TextView textView = (TextView) view.findViewById(id);
+        textView.setText(text);
     }
 }

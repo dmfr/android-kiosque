@@ -24,4 +24,9 @@
         android:orderInCategory="100"
         android:title="Signature"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_test"
+        android:orderInCategory="100"
+        android:title="TEST !"
+        app:showAsAction="never" />
 </menu>

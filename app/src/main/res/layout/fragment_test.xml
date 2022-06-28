@@ -1,14 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TestFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</FrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/goal_weight"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Goal height"
+                android:inputType="number"
+               />
+
+            <EditText
+                android:id="@+id/age"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Age"
+                android:inputType="number"
+                 />
+
+        </LinearLayout>
+
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="205dp"
+            android:layout_height="32dp"
+            android:orientation="horizontal">
+
+
+
+            <RadioButton
+                android:id="@+id/radioButton"
+                android:layout_width="45dp"
+                android:layout_height="33dp"
+                android:text="M"
+
+                android:onClick="radioButtonhandler"/>
+
+            <RadioButton
+                android:id="@+id/female"
+                android:layout_width="45dp"
+                android:layout_height="33dp"
+                android:text="F"
+
+                android:onClick="radioButtonhandler"/>
+
+            <RadioButton
+                android:id="@+id/other"
+                android:layout_width="96dp"
+                android:layout_height="33dp"
+                android:text="Other"
+
+                android:onClick="radioButtonhandler"/>
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/listview"
+            android:divider="@drawable/horizontal_divider"
+            android:dividerPadding="22dp"
+            android:showDividers="middle">
+        </LinearLayout>
+
+
+
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+        <TextView
+            android:layout_margin="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_blank_fragment" />
+
+    </LinearLayout>
+
+</ScrollView>

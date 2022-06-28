@@ -106,6 +106,9 @@ implements FragmentManager.OnBackStackChangedListener
         updateUI();
 
 
+        Log.w("DAMS","test") ;
+
+
         IntentFilter filter = new IntentFilter();
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         filter.addAction(getResources().getString(R.string.activity_intent_filter_action));
@@ -149,6 +152,9 @@ implements FragmentManager.OnBackStackChangedListener
         }
         if (id == R.id.action_signature) {
             signatureFragment();
+        }
+        if (id == R.id.action_test) {
+            testFragment();
         }
 
         return super.onOptionsItemSelected(item);
@@ -346,6 +352,15 @@ implements FragmentManager.OnBackStackChangedListener
         // Create and show the dialog.
         SignatureFragment newFragment = SignatureFragment.newInstance("str1","str2");
         newFragment.show(ft, "dialog");
+    }
+
+    public void testFragment() {
+
+        TestFragment newFragment = TestFragment.newInstance("str1","str2");
+        FragmentTransaction ft = getFragmentManager().beginTransaction() ;
+        ft.replace(R.id.fragment_container, (Fragment)newFragment, "visible_fragment");
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
