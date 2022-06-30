@@ -154,7 +154,8 @@ implements FragmentManager.OnBackStackChangedListener
             signatureFragment();
         }
         if (id == R.id.action_test) {
-            testFragment();
+            //testFragment();
+            testActivity();
         }
 
         return super.onOptionsItemSelected(item);
@@ -361,6 +362,11 @@ implements FragmentManager.OnBackStackChangedListener
         ft.replace(R.id.fragment_container, (Fragment)newFragment, "visible_fragment");
         ft.addToBackStack(null);
         ft.commit();
+    }
+
+    public void testActivity() {
+        Intent intent = new Intent(this, TestActivity.class);
+        startActivity(intent);
     }
 
     @Override
