@@ -18,7 +18,7 @@
         <activity
             android:name=".TestActivity"
             android:label="Test activité"
-            android:theme="@style/Theme.Kiosque.NoActionBar"
+            android:theme="@android:style/Theme.Holo.Light"
             />
         <activity
             android:name=".MainActivity"
