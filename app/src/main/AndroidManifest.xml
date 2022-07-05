@@ -17,8 +17,7 @@
         android:theme="@style/Theme.Kiosque">
         <activity
             android:name=".TestActivity"
-            android:label="Test activité"
-            android:theme="@android:style/Theme.Holo.Light"
+            android:label="PoD 5/07/2022 16h41"
             />
         <activity
             android:name=".MainActivity"
