@@ -1,21 +1,14 @@
 package za.dams.kiosque;
 
-
-
-
-import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.widget.Toolbar;
 
 import androidx.fragment.app.FragmentActivity ;
-
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -39,6 +32,9 @@ public class TestActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
+            if( position==1 ){
+                return TestGalleryFragment.newInstance("pouet","pouet");
+            }
             return DummyFragment.newInstance("pouet","pouet");
         }
 
