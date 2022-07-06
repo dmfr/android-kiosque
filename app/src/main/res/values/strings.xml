@@ -14,4 +14,6 @@
 
     <string name="activity_intent_filter_action">za.dams.kiosque.SCAN</string>
     <string name="datawedge_intent_key_data">com.symbol.datawedge.data_string</string>
+
+    <color name="mygray">#EEEEEE</color>
 </resources>
