@@ -67,14 +67,13 @@ public class TestFormFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mInflater = (LayoutInflater) getActivity().getLayoutInflater();
-        fillList();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_test, container, false);
+        return inflater.inflate(R.layout.fragment_test_form, container, false);
     }
 
     @Override
@@ -84,44 +83,6 @@ public class TestFormFragment extends Fragment {
 
     }
 
-    private void fillList() {
-        if( mInflater == null ) {
-            Log.w("DAMS","Layout is null") ;
-        } else {
-            Log.w("DAMS","Layout OK");
-        }
-
-
-        for( int a=0 ; a<10 ; a++) {
-            View view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
-
-
-            //view.setTag(linkModel);
-
-            setText(view, R.id.item_title, "Tagda pouet");
-            setText(view, R.id.item_caption, "ceci est un lien");
-
-            View colorView = view.findViewById(R.id.color);
-            int color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
-            colorView.setBackgroundColor( color );
-
-            ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
-
-            imgbtn.setVisibility(View.GONE);
-            /*
-            imgbtn.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_more));
-            imgbtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((ViewGroup)view).showContextMenu();
-                }
-            });
-             */
-
-
-            mListView.addView(view);
-        }
-    }
     private void setText(View view, int id, String text) {
         TextView textView = (TextView) view.findViewById(id);
         textView.setText(text);

@@ -1,17 +1,28 @@
 package za.dams.kiosque;
 
+import android.graphics.Point;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.zxing.ResultPoint;
+import com.journeyapps.barcodescanner.BarcodeCallback;
+import com.journeyapps.barcodescanner.BarcodeResult;
+import com.journeyapps.barcodescanner.DecoratedBarcodeView;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,7 +41,18 @@ public class TestScanFragment extends Fragment {
 
     private LayoutInflater mInflater ;
 
+    DecoratedBarcodeView barcodeView;
     ViewGroup mListView ;
+
+    private BarcodeCallback callback = new BarcodeCallback() {
+        @Override
+        public void barcodeResult(BarcodeResult result) {
+        }
+
+        @Override
+        public void possibleResultPoints(List<ResultPoint> resultPoints) {
+        }
+    };
 
     public TestScanFragment() {
         // Required empty public constructor
@@ -73,8 +95,18 @@ public class TestScanFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_test, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_test_scan, container, false);
+
+        barcodeView = rootView.findViewById(R.id.barcode_view);
+        barcodeView.setStatusText(null);
+        /*
+        capture = new CaptureManager(getActivity(), barcodeView);
+        capture.initializeFromIntent(getActivity().getIntent(), savedInstanceState);
+        capture.decode();
+         */
+        barcodeView.decodeContinuous(callback);
+
+        return rootView;
     }
 
     @Override
@@ -84,6 +116,30 @@ public class TestScanFragment extends Fragment {
 
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(barcodeView != null) {
+            if (isVisibleToUser) {
+                barcodeView.resume();
+            } else {
+                barcodeView.pauseAndWait();
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        barcodeView.pauseAndWait();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        barcodeView.resume();
+    }
+
     private void fillList() {
         if( mInflater == null ) {
             Log.w("DAMS","Layout is null") ;
@@ -91,36 +147,43 @@ public class TestScanFragment extends Fragment {
             Log.w("DAMS","Layout OK");
         }
 
+        View view ;
+        View colorView ;
+        int color ;
+        ImageButton imgbtn ;
 
-        for( int a=0 ; a<10 ; a++) {
-            View view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
-
-
-            //view.setTag(linkModel);
-
-            setText(view, R.id.item_title, "Tagda pouet");
-            setText(view, R.id.item_caption, "ceci est un lien");
-
-            View colorView = view.findViewById(R.id.color);
-            int color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
-            colorView.setBackgroundColor( color );
-
-            ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
-
-            imgbtn.setVisibility(View.GONE);
-            /*
-            imgbtn.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_more));
-            imgbtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((ViewGroup)view).showContextMenu();
-                }
-            });
-             */
+        view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
+        setText(view, R.id.item_title, "103986434 / 449770");
+        setText(view, R.id.item_caption, "AIRBUS LOGISTIK GMBH");
+        colorView = view.findViewById(R.id.color);
+        color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
+        colorView.setBackgroundColor( color );
+        imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
+        imgbtn.setVisibility(View.GONE);
+        mListView.addView(view);
 
 
-            mListView.addView(view);
-        }
+        view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
+        setText(view, R.id.item_title, "103986425 / 449766");
+        setText(view, R.id.item_caption, "SAFRAN LANDING SYSTEMS");
+        colorView = view.findViewById(R.id.color);
+        color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
+        colorView.setBackgroundColor( color );
+        imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
+        imgbtn.setVisibility(View.GONE);
+        mListView.addView(view);
+
+
+        view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
+        setText(view, R.id.item_title, "103986369 / 449705");
+        setText(view, R.id.item_caption, "SAUDI ARABIAN AIRLINES");
+        colorView = view.findViewById(R.id.color);
+        color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
+        colorView.setBackgroundColor( color );
+        imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
+        imgbtn.setVisibility(View.GONE);
+        mListView.addView(view);
+
     }
     private void setText(View view, int id, String text) {
         TextView textView = (TextView) view.findViewById(id);

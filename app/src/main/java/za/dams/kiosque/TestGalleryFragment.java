@@ -20,6 +20,13 @@ import java.util.HashMap;
  */
 public class TestGalleryFragment extends Fragment {
 
+    // Array of integers points to images stored in /res/drawable-ldpi/
+    int[] images = new int[]{
+            R.drawable.gallery1,
+            R.drawable.gallery2,
+            R.drawable.gallery3
+    };
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -71,12 +78,14 @@ public class TestGalleryFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         //Log.w(TAG,"My Fragment Id is "+mTransaction.getCrmFileCode() );
-        ArrayList<HashMap<String, Object>> mList = new ArrayList<HashMap<String, Object>>();
-        mList.add(new HashMap<String, Object>()) ;
-        mList.add(new HashMap<String, Object>()) ;
-        mList.add(new HashMap<String, Object>()) ;
-        String[] adaptFrom = {};
-        int[] adaptTo = {};
+        ArrayList<HashMap<String, String>> mList = new ArrayList<HashMap<String, String>>();
+        for( int i=0 ; i<3 ; i++ ) {
+            HashMap<String, String> hm = new HashMap<String,String>();
+            hm.put("image", Integer.toString(images[i]));
+            mList.add(hm);
+        }
+        String[] adaptFrom = {"image"};
+        int[] adaptTo = {R.id.galleryitem};
         GridView mgv = (GridView) getView().findViewById(R.id.galleryview);
         //mgv.setAdapter(new SimpleAdapter(getActivity().getApplicationContext(), mList, R.layout.gallery_item, adaptFrom, adaptTo));
         mgv.setAdapter(new SimpleAdapter(getActivity().getApplicationContext(), mList, R.layout.gallery_item, adaptFrom, adaptTo));
