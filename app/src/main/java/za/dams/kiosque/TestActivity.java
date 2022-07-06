@@ -32,8 +32,14 @@ public class TestActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
+            if( position==0 ){
+                return TestScanFragment.newInstance("pouet","pouet");
+            }
             if( position==1 ){
                 return TestGalleryFragment.newInstance("pouet","pouet");
+            }
+            if( position==2 ){
+                return TestFormFragment.newInstance("pouet","pouet");
             }
             return DummyFragment.newInstance("pouet","pouet");
         }
