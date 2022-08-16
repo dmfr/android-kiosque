@@ -1,5 +1,6 @@
 package za.dams.kiosque;
 
+import android.content.Context;
 import android.graphics.Point;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
@@ -13,8 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.zxing.ResultPoint;
@@ -22,7 +26,10 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import za.dams.kiosque.util.TracyPodTransactionManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -89,7 +96,7 @@ public class TestScanFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mInflater = (LayoutInflater) getActivity().getLayoutInflater();
-        fillList();
+        fillList() ;
     }
 
     @Override
@@ -112,7 +119,7 @@ public class TestScanFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mListView = (ViewGroup) view.findViewById(R.id.listview) ;
-
+        //((ListView)mListView).setAdapter();
 
     }
 
@@ -141,52 +148,162 @@ public class TestScanFragment extends Fragment {
     }
 
     private void fillList() {
-        if( mInflater == null ) {
-            Log.w("DAMS","Layout is null") ;
-        } else {
-            Log.w("DAMS","Layout OK");
+        ArrayList<TracyPodTransactionManager.LinkModel> data = new ArrayList<TracyPodTransactionManager.LinkModel>();
+
+        TracyPodTransactionManager.LinkModel lm ;
+        for( int i=0 ; i<4 ; i++) {
+            lm = new TracyPodTransactionManager.LinkModel() ;
+            lm.name = "103986425 / 449766 "+"("+i+")";
+            lm.urlBase = "AIRBUS LOGISTIK GMBH";
+            lm.isProd = (i%2==0);
+            data.add(lm);
         }
 
-        View view ;
-        View colorView ;
-        int color ;
-        ImageButton imgbtn ;
-
-        view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
-        setText(view, R.id.item_title, "103986434 / 449770");
-        setText(view, R.id.item_caption, "AIRBUS LOGISTIK GMBH");
-        colorView = view.findViewById(R.id.color);
-        color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
-        colorView.setBackgroundColor( color );
-        imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
-        imgbtn.setVisibility(View.GONE);
-        mListView.addView(view);
-
-
-        view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
-        setText(view, R.id.item_title, "103986425 / 449766");
-        setText(view, R.id.item_caption, "SAFRAN LANDING SYSTEMS");
-        colorView = view.findViewById(R.id.color);
-        color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
-        colorView.setBackgroundColor( color );
-        imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
-        imgbtn.setVisibility(View.GONE);
-        mListView.addView(view);
-
-
-        view = mInflater.inflate(R.layout.fragment_linkslist_item, null);
-        setText(view, R.id.item_title, "103986369 / 449705");
-        setText(view, R.id.item_caption, "SAUDI ARABIAN AIRLINES");
-        colorView = view.findViewById(R.id.color);
-        color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
-        colorView.setBackgroundColor( color );
-        imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
-        imgbtn.setVisibility(View.GONE);
-        mListView.addView(view);
+        ListView listview = (ListView)mListView ;
+        if( listview == null ) {
+            return ;
+        }
+        ScanListAdapter adapter = (ScanListAdapter)(listview.getAdapter()) ;
+        if (adapter == null) {
+            adapter = new ScanListAdapter(getActivity(), data, null);
+        } else {
+            adapter.changeData(data);
+        }
+        listview.setAdapter(adapter);
+        //setListShown(true) ;
+        //getListView().setOnItemClickListener(adapter);
 
     }
     private void setText(View view, int id, String text) {
         TextView textView = (TextView) view.findViewById(id);
         textView.setText(text);
     }
+
+    private void onLinkClicked(TracyPodTransactionManager.LinkModel clickedLink) {
+        Log.w("DAMS","pouet pouet");
+    }
+
+
+
+    private class ScanListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
+
+        private static final String TAG = "ScanListAdapter";
+
+        private LayoutInflater mInflater;
+        private static final int LAYOUT = R.layout.fragment_linkslist_item;
+
+        private List<TracyPodTransactionManager.LinkModel> mData;
+        private String mSelectedEntryKey ;
+
+        public ScanListAdapter(Context context, List<TracyPodTransactionManager.LinkModel> data, String presetEntryKey) {
+            super();
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            initData(data,presetEntryKey) ;
+        }
+
+        private void initData( List<TracyPodTransactionManager.LinkModel> data, String presetEntryKey ) {
+            mData = data ;
+            if( presetEntryKey == null ) {
+                mSelectedEntryKey = null ;
+                return ;
+            }
+
+            boolean found = false ;
+            for( TracyPodTransactionManager.LinkModel be : data ) {
+                if( presetEntryKey != null && be.name.equals(presetEntryKey) ) {
+                    found = true ;
+                }
+            }
+            if( found ) {
+                mSelectedEntryKey = presetEntryKey ;
+            }
+        }
+
+        public void changeData( List<TracyPodTransactionManager.LinkModel> data ) {
+            initData(data,mSelectedEntryKey) ;
+        }
+
+        @Override
+        public int getCount() {
+            if( mData==null ) {
+                return 0 ;
+            }
+            return mData.size() ;
+        }
+
+        @Override
+        public TracyPodTransactionManager.LinkModel getItem(int position) {
+            if (position >= getCount()) {
+                return null;
+            }
+
+            return mData.get(position) ;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            if (position >= getCount()) {
+                return 0;
+            }
+            return position ;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (position >= getCount()) {
+                return null;
+            }
+
+            TracyPodTransactionManager.LinkModel linkModel = getItem(position) ;
+
+            View view;
+            if (convertView == null) {
+                view = mInflater.inflate(LAYOUT, parent, false);
+            } else {
+                view = convertView;
+            }
+
+            view.setTag(linkModel);
+
+            setText(view, R.id.item_title, linkModel.name);
+            setText(view, R.id.item_caption, linkModel.urlBase);
+
+            View colorView = view.findViewById(R.id.color);
+            int color = getResources().getColor( linkModel.isProd ? android.R.color.holo_green_light : R.color.grey ) ;
+            colorView.setBackgroundColor( color );
+
+            ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
+
+            imgbtn.setVisibility(View.GONE);
+            /*
+            imgbtn.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_more));
+            imgbtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((ViewGroup)view).showContextMenu();
+                }
+            });
+             */
+
+
+            return view;
+        }
+        private void setText(View view, int id, String text) {
+            TextView textView = (TextView) view.findViewById(id);
+            textView.setText(text);
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)  {
+            TracyPodTransactionManager.LinkModel clickedLink = getItem(position) ;
+
+            TestScanFragment.this.onLinkClicked(clickedLink) ;
+        }
+
+
+        public String getSelectedEntryKey() {
+            return mSelectedEntryKey ;
+        }
+    }
+
 }
