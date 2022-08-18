@@ -1,17 +1,24 @@
 package za.dams.kiosque;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import za.dams.kiosque.util.SimpleImageLoader;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -87,7 +94,99 @@ public class TestGalleryFragment extends Fragment {
         String[] adaptFrom = {"image"};
         int[] adaptTo = {R.id.galleryitem};
         GridView mgv = (GridView) getView().findViewById(R.id.galleryview);
-        //mgv.setAdapter(new SimpleAdapter(getActivity().getApplicationContext(), mList, R.layout.gallery_item, adaptFrom, adaptTo));
-        mgv.setAdapter(new SimpleAdapter(getActivity().getApplicationContext(), mList, R.layout.gallery_item, adaptFrom, adaptTo));
+
+        ArrayList<ImageModel> arrImages = new ArrayList<ImageModel>() ;
+        for( int i=0 ; i<19 ; i++ ) {
+            int picIdx = i%3 + 1 ;
+            arrImages.add( new ImageModel("https://10-39-10-205.int.mirabel-sil.com/tmp/dl.php?pic="+picIdx));
+        }
+
+
+
+
+        MediaAdapter gridAdapter = new MediaAdapter(getActivity().getApplicationContext());
+        gridAdapter.setData(new ArrayList<ImageModel>() ) ;
+        mgv.setAdapter(gridAdapter);
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.w("DAMS","Coucou !") ;
+                gridAdapter.setData(arrImages ) ;
+            }
+        };
+        Handler handler = new Handler();
+        handler.postDelayed(runnable, 2000);
+
+        /*
+   	MediaAdapter gridAdapter = new MediaAdapter(mContext);
+    	gridAdapter.setData(arrCfr) ;
+    	GridView gridView = (GridView)mInflater.inflate(R.layout.explorer_gallery, null) ;
+    	gridView.setAdapter(gridAdapter) ;
+        */
     }
+
+
+    private class ImageModel {
+        String sUrl ;
+        public ImageModel(String tUrl) {
+            sUrl = tUrl ;
+        }
+    }
+
+    private class MediaAdapter extends BaseAdapter {
+
+        Context mAdapterContext ;
+
+        LayoutInflater mInflater ;
+        ArrayList<ImageModel> mArrObj ;
+
+        SimpleImageLoader mSimpleImageLoader ;
+
+        public MediaAdapter( Context c ) {
+            super() ;
+            mAdapterContext = c.getApplicationContext() ;
+            mInflater = (LayoutInflater) c.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+            mSimpleImageLoader = new SimpleImageLoader(mAdapterContext) ;
+        }
+
+        public void setData( ArrayList<ImageModel> arrObj ) {
+            mArrObj = arrObj ;
+            notifyDataSetChanged() ;
+        }
+
+        @Override
+        public int getCount() {
+            return mArrObj.size() ;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mArrObj.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position ;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ImageModel imodel = mArrObj.get(position) ;
+
+            if( convertView==null ) {
+                convertView = mInflater.inflate(R.layout.gallery_item, null) ;
+            }
+
+            ImageView imgView = (ImageView)convertView.findViewById(R.id.galleryitem) ;
+
+            mSimpleImageLoader.download(imodel.sUrl, imgView) ;
+
+
+            return convertView;
+        }
+
+    }
+
 }
