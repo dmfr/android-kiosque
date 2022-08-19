@@ -1,7 +1,9 @@
 package za.dams.kiosque;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toolbar;
 
 import androidx.fragment.app.FragmentActivity ;
@@ -11,6 +13,10 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.UUID;
+
+import za.dams.kiosque.util.TracyPodTransactionManager;
 
 public class TestActivity extends FragmentActivity {
 
@@ -58,6 +64,15 @@ public class TestActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.w("DAMS","TestActivity create") ;
+
+        TracyPodTransactionManager tracyPod = TracyPodTransactionManager.getInstance(this) ;
+        UUID tracyPodUUID = tracyPod.getTransactionUUID();
+        if( tracyPodUUID != null ) {
+            Log.w("DAMS", "UUID is " + tracyPodUUID.toString());
+        }
+
         setContentView(R.layout.activity_test);
 
         Toolbar toolbar = findViewById(R.id.toolbar);

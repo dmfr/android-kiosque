@@ -138,6 +138,7 @@ public class TestScanFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        transactionDoSave() ;
         barcodeView.pauseAndWait();
     }
 
@@ -181,6 +182,11 @@ public class TestScanFragment extends Fragment {
 
     private void onLinkClicked(TracyPodTransactionManager.LinkModel clickedLink) {
         Log.w("DAMS","pouet pouet");
+    }
+
+    private void transactionDoSave() {
+        TracyPodTransactionManager tracyPod = TracyPodTransactionManager.getInstance(getActivity()) ;
+        tracyPod.onSave() ;
     }
 
 
