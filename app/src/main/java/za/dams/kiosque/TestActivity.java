@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toolbar;
 
 import androidx.fragment.app.FragmentActivity ;
@@ -20,6 +22,7 @@ import za.dams.kiosque.util.TracyPodTransactionManager;
 
 public class TestActivity extends FragmentActivity {
 
+    ViewPager mViewPager ;
 
     private class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
         final int PAGE_COUNT = 3;
@@ -79,13 +82,58 @@ public class TestActivity extends FragmentActivity {
         setActionBar(toolbar);
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(),
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        mViewPager.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(),
                 TestActivity.this));
 
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setupWithViewPager(mViewPager);
+
+
+        Log.w("DAMS",""+getSupportFragmentManager().getFragments().size()) ; ;
+
+
+        //mViewPager.getAdapter().get
+        /*
+        Fragment page = getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewpager + ":" + mViewPager.getCurrentItem());
+        Log.w("DAMS",""+page.getClass().toString()) ;
+        if( page instanceof TestScanFragment ) {
+
+        }
+         */
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_tracypod, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch( item.getItemId() ) {
+            case R.id.action_test:
+                actionTest();
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private Fragment getCurrentFragment() {
+        Fragment page = getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewpager + ":" + mViewPager.getCurrentItem());
+        return page ;
+    }
+    private void actionTest() {
+        Fragment page = getCurrentFragment() ;
+        if( page != null && page instanceof TestScanFragment ) {
+            Log.w("DAMS","TestScanFragment !!!!") ;
+        }
+
     }
 
 
