@@ -95,8 +95,17 @@ public class TestScanFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mInflater = (LayoutInflater) getActivity().getLayoutInflater();
-        fillList() ;
+        //mInflater = (LayoutInflater) getActivity().getLayoutInflater();
+
+        ListView listview = (ListView)mListView ;
+        if( listview == null ) {
+            return ;
+        }
+        ScanListAdapter adapter = (ScanListAdapter)(listview.getAdapter()) ;
+        if (adapter == null) {
+            adapter = new ScanListAdapter(getActivity());
+        }
+        listview.setAdapter(adapter);
     }
 
     @Override
@@ -148,7 +157,18 @@ public class TestScanFragment extends Fragment {
         barcodeView.resume();
     }
 
+    public void addDummy() {
+
+        ScanListAdapter sla = ((ScanListAdapter)((ListView)mListView).getAdapter()) ;
+        if( sla == null ) {
+            Log.w("DAMS","???") ;
+            return ;
+        }
+        sla.addDummy() ;
+    }
+
     private void fillList() {
+        /*
         ArrayList<TracyPodTransactionManager.LinkModel> data = new ArrayList<TracyPodTransactionManager.LinkModel>();
 
         TracyPodTransactionManager.LinkModel lm ;
@@ -159,18 +179,8 @@ public class TestScanFragment extends Fragment {
             lm.isProd = (i%2==0);
             data.add(lm);
         }
+        */
 
-        ListView listview = (ListView)mListView ;
-        if( listview == null ) {
-            return ;
-        }
-        ScanListAdapter adapter = (ScanListAdapter)(listview.getAdapter()) ;
-        if (adapter == null) {
-            adapter = new ScanListAdapter(getActivity(), data, null);
-        } else {
-            adapter.changeData(data);
-        }
-        listview.setAdapter(adapter);
         //setListShown(true) ;
         //getListView().setOnItemClickListener(adapter);
 
@@ -180,7 +190,7 @@ public class TestScanFragment extends Fragment {
         textView.setText(text);
     }
 
-    private void onLinkClicked(TracyPodTransactionManager.LinkModel clickedLink) {
+    private void onLinkClicked(TracyPodTransactionManager.ScanRowModel clickedLink) {
         Log.w("DAMS","pouet pouet");
     }
 
@@ -198,39 +208,17 @@ public class TestScanFragment extends Fragment {
         private LayoutInflater mInflater;
         private static final int LAYOUT = R.layout.fragment_linkslist_item;
 
-        private List<TracyPodTransactionManager.LinkModel> mData;
-        private String mSelectedEntryKey ;
+        private final TracyPodTransactionManager mTracyPodTransactionManager ;
 
-        public ScanListAdapter(Context context, List<TracyPodTransactionManager.LinkModel> data, String presetEntryKey) {
+        public ScanListAdapter(Context context) {
             super();
             mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            initData(data,presetEntryKey) ;
-        }
-
-        private void initData( List<TracyPodTransactionManager.LinkModel> data, String presetEntryKey ) {
-            mData = data ;
-            if( presetEntryKey == null ) {
-                mSelectedEntryKey = null ;
-                return ;
-            }
-
-            boolean found = false ;
-            for( TracyPodTransactionManager.LinkModel be : data ) {
-                if( presetEntryKey != null && be.name.equals(presetEntryKey) ) {
-                    found = true ;
-                }
-            }
-            if( found ) {
-                mSelectedEntryKey = presetEntryKey ;
-            }
-        }
-
-        public void changeData( List<TracyPodTransactionManager.LinkModel> data ) {
-            initData(data,mSelectedEntryKey) ;
+            mTracyPodTransactionManager = TracyPodTransactionManager.getInstance(context) ;
         }
 
         @Override
         public int getCount() {
+            ArrayList<TracyPodTransactionManager.ScanRowModel> mData = mTracyPodTransactionManager.getArrScanRows();
             if( mData==null ) {
                 return 0 ;
             }
@@ -238,7 +226,8 @@ public class TestScanFragment extends Fragment {
         }
 
         @Override
-        public TracyPodTransactionManager.LinkModel getItem(int position) {
+        public TracyPodTransactionManager.ScanRowModel getItem(int position) {
+            ArrayList<TracyPodTransactionManager.ScanRowModel> mData = mTracyPodTransactionManager.getArrScanRows();
             if (position >= getCount()) {
                 return null;
             }
@@ -260,7 +249,7 @@ public class TestScanFragment extends Fragment {
                 return null;
             }
 
-            TracyPodTransactionManager.LinkModel linkModel = getItem(position) ;
+            TracyPodTransactionManager.ScanRowModel scanRow = getItem(position) ;
 
             View view;
             if (convertView == null) {
@@ -269,13 +258,13 @@ public class TestScanFragment extends Fragment {
                 view = convertView;
             }
 
-            view.setTag(linkModel);
+            view.setTag(scanRow);
 
-            setText(view, R.id.item_title, linkModel.name);
-            setText(view, R.id.item_caption, linkModel.urlBase);
+            setText(view, R.id.item_title, scanRow.displayTitle);
+            setText(view, R.id.item_caption, scanRow.displayCaption);
 
             View colorView = view.findViewById(R.id.color);
-            int color = getResources().getColor( linkModel.isProd ? android.R.color.holo_green_light : R.color.grey ) ;
+            int color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
             colorView.setBackgroundColor( color );
 
             ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
@@ -300,15 +289,16 @@ public class TestScanFragment extends Fragment {
         }
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id)  {
-            TracyPodTransactionManager.LinkModel clickedLink = getItem(position) ;
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            TracyPodTransactionManager.ScanRowModel clickedLink = getItem(position);
 
-            TestScanFragment.this.onLinkClicked(clickedLink) ;
+            TestScanFragment.this.onLinkClicked(clickedLink);
         }
 
 
-        public String getSelectedEntryKey() {
-            return mSelectedEntryKey ;
+        public void addDummy() {
+            mTracyPodTransactionManager.addDummy();
+            notifyDataSetChanged();
         }
     }
 

@@ -74,6 +74,8 @@ public class TestActivity extends FragmentActivity {
         UUID tracyPodUUID = tracyPod.getTransactionUUID();
         if( tracyPodUUID != null ) {
             Log.w("DAMS", "UUID is " + tracyPodUUID.toString());
+        } else {
+            Log.w("DAMS", "No transaction UUID");
         }
 
         setContentView(R.layout.activity_test);
@@ -132,6 +134,7 @@ public class TestActivity extends FragmentActivity {
         Fragment page = getCurrentFragment() ;
         if( page != null && page instanceof TestScanFragment ) {
             Log.w("DAMS","TestScanFragment !!!!") ;
+            ((TestScanFragment) page).addDummy();
         }
 
     }

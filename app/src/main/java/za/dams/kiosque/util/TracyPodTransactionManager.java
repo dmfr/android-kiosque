@@ -4,18 +4,13 @@ import android.content.Context;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class TracyPodTransactionManager {
-    public static class LinkModel {
-        public int idx = -1 ;
-        public String name ;
-        public String urlBase ;
-        public String urlParams ;
-        public boolean isProd ;
-        public String getUrl() {
-            return urlParams.length()> 0 ? urlBase+'?'+urlParams : urlBase ;
-        }
+    public static class ScanRowModel {
+        public String displayTitle ;
+        public String displayCaption ;
     }
 
     @SuppressWarnings("unused")
@@ -28,10 +23,12 @@ public class TracyPodTransactionManager {
 
     private Context mContext ;
     private UUID mTransactionUUID = null ;
+    private ArrayList<ScanRowModel> mArrScanRows = null ;
 
     private TracyPodTransactionManager( Context c ) {
         mContext = c ;
         mTransactionUUID = null ;
+        mArrScanRows = new ArrayList<ScanRowModel>() ;
     }
     private TracyPodTransactionManager( Context c , JSONObject jsonObject ) {
         mContext = c ;
@@ -102,9 +99,27 @@ public class TracyPodTransactionManager {
     public UUID getTransactionUUID() {
         return mTransactionUUID;
     }
+    public ArrayList<ScanRowModel> getArrScanRows() {
+        return mArrScanRows ;
+    }
+    public void addDummy() {
+        int i = mArrScanRows.size();
+
+        ScanRowModel newRow = new ScanRowModel() ;
+        newRow.displayTitle = "103986425 / 449766 "+"("+i+")" ;
+        newRow.displayCaption = "AIRBUS LOGISTIK GMBH" ;
+        mArrScanRows.add( newRow ) ;
+
+        onSave();
+    }
+    private boolean isEmpty() {
+        if( mArrScanRows.size() > 0 ) {
+            return false ;
+        }
+        return true ;
+    }
     public void onSave() {
-        boolean isEmpty = true ;
-        if( isEmpty ) {
+        if( isEmpty() ) {
             mTransactionUUID = null ;
             return ;
         }

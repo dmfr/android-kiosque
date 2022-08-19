@@ -385,12 +385,12 @@ implements FragmentManager.OnBackStackChangedListener
                 .setCancelable(true)
                 .setPositiveButton("Resume", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        TracyPodTransactionManager.purgeInstance(MainActivity.this);
                         startActivity(intentLaunch);
                     }
                 })
                 .setNegativeButton("Discard", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        TracyPodTransactionManager.purgeInstance(MainActivity.this);
                         startActivity(intentLaunch);
                     }
                 });
