@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.DialogFragment;
 
 import android.os.Handler;
 import android.util.Log;
@@ -15,6 +16,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,7 +28,7 @@ import za.dams.kiosque.util.SimpleImageLoader;
  * Use the {@link TestGalleryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TestGalleryFragment extends Fragment {
+public class TestGalleryFragment extends Fragment implements View.OnClickListener {
 
     // Array of integers points to images stored in /res/drawable-ldpi/
     int[] images = new int[]{
@@ -34,14 +37,7 @@ public class TestGalleryFragment extends Fragment {
             R.drawable.gallery3
     };
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private View mFab ;
 
     public TestGalleryFragment() {
         // Required empty public constructor
@@ -58,27 +54,25 @@ public class TestGalleryFragment extends Fragment {
     // TODO: Rename and change types and number of parameters
     public static TestGalleryFragment newInstance(String param1, String param2) {
         TestGalleryFragment fragment = new TestGalleryFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.gallery_view, container, false);
+        View view = inflater.inflate(R.layout.gallery_view, container, false);
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(this);
+        mFab = fab ;
+
+        return view ;
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -124,6 +118,15 @@ public class TestGalleryFragment extends Fragment {
     	GridView gridView = (GridView)mInflater.inflate(R.layout.explorer_gallery, null) ;
     	gridView.setAdapter(gridAdapter) ;
         */
+    }
+
+    @Override
+    public void onClick(View v) {
+        if( v==mFab ) {
+            Log.w("DAMS","Floating button clicked") ;
+            DialogFragment f = (DialogFragment)TestCameraFragment.newInstance() ;
+            f.show( getFragmentManager(), "dialog") ;
+        }
     }
 
 
