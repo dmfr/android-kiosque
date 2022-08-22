@@ -2,6 +2,7 @@ package za.dams.kiosque;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -68,8 +69,9 @@ public class TestActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.w("DAMS","TestActivity create") ;
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        Log.w("DAMS","TestActivity create") ;
         TracyPodTransactionManager tracyPod = TracyPodTransactionManager.getInstance(this) ;
         UUID tracyPodUUID = tracyPod.getTransactionUUID();
         if( tracyPodUUID != null ) {
