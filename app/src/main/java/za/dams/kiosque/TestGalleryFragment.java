@@ -1,10 +1,16 @@
 package za.dams.kiosque;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.os.Handler;
 import android.util.Log;
@@ -18,6 +24,10 @@ import android.widget.SimpleAdapter;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,6 +46,10 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
             R.drawable.gallery2,
             R.drawable.gallery3
     };
+
+    private static final int RES_LOADING = R.drawable.ic_explorer_fileicon ;
+    private Context mContext ;
+    private Bitmap mBitmapLoading ;
 
     private View mFab ;
 
@@ -78,6 +92,9 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mContext = getActivity().getApplicationContext() ;
+        mBitmapLoading = ((BitmapDrawable)mContext.getResources().getDrawable(RES_LOADING)).getBitmap() ;
+
         //Log.w(TAG,"My Fragment Id is "+mTransaction.getCrmFileCode() );
         ArrayList<HashMap<String, String>> mList = new ArrayList<HashMap<String, String>>();
         for( int i=0 ; i<3 ; i++ ) {
@@ -110,7 +127,7 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
             }
         };
         Handler handler = new Handler();
-        handler.postDelayed(runnable, 2000);
+        handler.postDelayed(runnable, 500);
 
         /*
    	MediaAdapter gridAdapter = new MediaAdapter(mContext);
@@ -191,5 +208,86 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         }
 
     }
+
+
+    private void ayncloadThumb( String localpath, ImageView imgView ) {
+
+    }
+    private class LoadedDrawable extends BitmapDrawable {
+        private final WeakReference<BitmapLoaderTask> bitmapLoaderTaskReference;
+
+        public LoadedDrawable(BitmapLoaderTask bitmaploaderTask) {
+            super(mContext.getResources(),mBitmapLoading);
+            bitmapLoaderTaskReference =
+                    new WeakReference<BitmapLoaderTask>(bitmaploaderTask);
+        }
+
+        public BitmapLoaderTask getBitmapLoaderTask() {
+            return bitmapLoaderTaskReference.get();
+        }
+    }
+    private static BitmapLoaderTask getBitmapLoaderTask(ImageView imageView) {
+        if (imageView != null) {
+            Drawable drawable = imageView.getDrawable();
+            if (drawable instanceof LoadedDrawable) {
+                LoadedDrawable loadedDrawable = (LoadedDrawable)drawable;
+                return loadedDrawable.getBitmapLoaderTask();
+            }
+        }
+        return null;
+    }
+    class BitmapLoaderTask extends AsyncTask<URI, Void, Bitmap> {
+        private URL urlRequested ;
+        private URL urlDownload ;
+        private final WeakReference<ImageView> imageViewReference;
+
+        public BitmapLoaderTask(ImageView imageView) {
+            imageViewReference = new WeakReference<ImageView>(imageView);
+        }
+
+        /**
+         * Actual download method.
+         */
+        @Override
+        protected Bitmap doInBackground(URI... params) {
+            Bitmap resultBitmap = null ;
+
+            // Téléchargement
+            //resultBitmap = downloadBitmap(urlDownload);
+            if( resultBitmap != null ) {
+                return resultBitmap ;
+            }
+            return null ;
+        }
+
+        /**
+         * Once the image is downloaded, associates it to the imageView
+         */
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            if (isCancelled()) {
+                bitmap = null;
+            }
+
+            if (imageViewReference != null) {
+                ImageView imageView = imageViewReference.get();
+                BitmapLoaderTask bitmapLoaderTask = getBitmapLoaderTask(imageView);
+                // Change bitmap only if this process is still associated with it
+                // Or if we don't use any bitmap to task association (NO_DOWNLOADED_DRAWABLE mode)
+                if( this == bitmapLoaderTask ) {
+                    if( bitmap!=null ) {
+                        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                        imageView.setImageBitmap(bitmap);
+                    } else {
+                        imageView.setScaleType(ImageView.ScaleType.CENTER) ;
+                        imageView.setImageBitmap(null);
+                    }
+                }
+
+            }
+
+        }
+    }
+
 
 }
