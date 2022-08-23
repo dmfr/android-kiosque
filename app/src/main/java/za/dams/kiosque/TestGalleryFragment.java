@@ -141,8 +141,17 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         if( v==mFab ) {
             Log.w("DAMS","Floating button clicked") ;
+            FragmentManager fm = getFragmentManager() ;
             DialogFragment f = (DialogFragment)TestCameraFragment.newInstance() ;
-            f.show( getFragmentManager(), "dialog") ;
+            f.show( fm, "dialog") ;
+            fm.executePendingTransactions();
+            f.getDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {
+                    //do whatever you want when dialog is dismissed
+                    Log.w("DAMS","Dismissed !!") ;
+                }
+            });
         }
     }
 
