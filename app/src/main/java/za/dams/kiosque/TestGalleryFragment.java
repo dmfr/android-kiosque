@@ -2,12 +2,15 @@ package za.dams.kiosque;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
@@ -24,6 +27,7 @@ import android.widget.SimpleAdapter;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -32,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import za.dams.kiosque.util.SimpleImageLoader;
+import za.dams.kiosque.util.TracyPodTransactionManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -73,6 +78,7 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
     }
 
@@ -95,71 +101,27 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         mContext = getActivity().getApplicationContext() ;
         mBitmapLoading = ((BitmapDrawable)mContext.getResources().getDrawable(RES_LOADING)).getBitmap() ;
 
-        //Log.w(TAG,"My Fragment Id is "+mTransaction.getCrmFileCode() );
-        ArrayList<HashMap<String, String>> mList = new ArrayList<HashMap<String, String>>();
-        for( int i=0 ; i<3 ; i++ ) {
-            HashMap<String, String> hm = new HashMap<String,String>();
-            hm.put("image", Integer.toString(images[i]));
-            mList.add(hm);
-        }
-        String[] adaptFrom = {"image"};
-        int[] adaptTo = {R.id.galleryitem};
         GridView mgv = (GridView) getView().findViewById(R.id.galleryview);
-
-        ArrayList<ImageModel> arrImages = new ArrayList<ImageModel>() ;
-        for( int i=0 ; i<19 ; i++ ) {
-            int picIdx = i%3 + 1 ;
-            arrImages.add( new ImageModel("https://10-39-10-205.int.mirabel-sil.com/tmp/dl.php?pic="+picIdx));
-        }
-
-
-
-
         MediaAdapter gridAdapter = new MediaAdapter(getActivity().getApplicationContext());
-        gridAdapter.setData(new ArrayList<ImageModel>() ) ;
         mgv.setAdapter(gridAdapter);
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Log.w("DAMS","Coucou !") ;
-                gridAdapter.setData(arrImages ) ;
-            }
-        };
-        Handler handler = new Handler();
-        handler.postDelayed(runnable, 500);
-
-        /*
-   	MediaAdapter gridAdapter = new MediaAdapter(mContext);
-    	gridAdapter.setData(arrCfr) ;
-    	GridView gridView = (GridView)mInflater.inflate(R.layout.explorer_gallery, null) ;
-    	gridView.setAdapter(gridAdapter) ;
-        */
     }
+
 
     @Override
     public void onClick(View v) {
         if( v==mFab ) {
             Log.w("DAMS","Floating button clicked") ;
             FragmentManager fm = getFragmentManager() ;
-            DialogFragment f = (DialogFragment)TestCameraFragment.newInstance() ;
+            TestCameraFragment f = TestCameraFragment.newInstance() ;
+            f.setTargetFragment(this,1);
             f.show( fm, "dialog") ;
-            fm.executePendingTransactions();
-            f.getDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialogInterface) {
-                    //do whatever you want when dialog is dismissed
-                    Log.w("DAMS","Dismissed !!") ;
-                }
-            });
         }
     }
-
-
-    private class ImageModel {
-        String sUrl ;
-        public ImageModel(String tUrl) {
-            sUrl = tUrl ;
+    public void onCameraFinish() {
+        GridView gv = (GridView)getView().findViewById(R.id.galleryview) ;
+        if( gv != null ) {
+            ((MediaAdapter)gv.getAdapter()).notifyDataSetChanged();
+            Log.w("DAMS","Adapter count "+((MediaAdapter)gv.getAdapter()).getCount()) ;
         }
     }
 
@@ -168,7 +130,7 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         Context mAdapterContext ;
 
         LayoutInflater mInflater ;
-        ArrayList<ImageModel> mArrObj ;
+        TracyPodTransactionManager mTracyPodTransactionManager ;
 
         SimpleImageLoader mSimpleImageLoader ;
 
@@ -177,50 +139,73 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
             mAdapterContext = c.getApplicationContext() ;
             mInflater = (LayoutInflater) c.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
             mSimpleImageLoader = new SimpleImageLoader(mAdapterContext) ;
+            mTracyPodTransactionManager = TracyPodTransactionManager.getInstance(c) ;
         }
 
-        public void setData( ArrayList<ImageModel> arrObj ) {
-            mArrObj = arrObj ;
-            notifyDataSetChanged() ;
-        }
 
         @Override
         public int getCount() {
-            return mArrObj.size() ;
+            ArrayList<TracyPodTransactionManager.PhotoModel> mData = mTracyPodTransactionManager.getArrPhotos();
+            if( mData==null ) {
+                return 0 ;
+            }
+            return mData.size() ;
         }
 
         @Override
-        public Object getItem(int position) {
-            return mArrObj.get(position);
+        public TracyPodTransactionManager.PhotoModel getItem(int position) {
+            ArrayList<TracyPodTransactionManager.PhotoModel> mData = mTracyPodTransactionManager.getArrPhotos();
+            if (position >= getCount()) {
+                return null;
+            }
+
+            return mData.get(position) ;
         }
 
         @Override
         public long getItemId(int position) {
+            if (position >= getCount()) {
+                return 0;
+            }
             return position ;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            ImageModel imodel = mArrObj.get(position) ;
+            if (position >= getCount()) {
+                return null;
+            }
+
+            TracyPodTransactionManager.PhotoModel photoRow = getItem(position) ;
 
             if( convertView==null ) {
                 convertView = mInflater.inflate(R.layout.gallery_item, null) ;
             }
 
             ImageView imgView = (ImageView)convertView.findViewById(R.id.galleryitem) ;
-
-            mSimpleImageLoader.download(imodel.sUrl, imgView) ;
-
-
+            if( photoRow.exampleUrl != null ) {
+                mSimpleImageLoader.download(photoRow.exampleUrl, imgView);
+            } else if( photoRow.photoFilename != null ) {
+                ayncloadThumb(photoRow.photoFilename,imgView) ;
+            }
             return convertView;
         }
 
     }
 
 
-    private void ayncloadThumb( String localpath, ImageView imgView ) {
+    /*
+    Dummy async load inspired from SimpleImageLoader
+     */
+    private void ayncloadThumb( String filename, ImageView imgView ) {
+        File file = new File(getContext().getCacheDir(),filename) ;
 
+        BitmapLoaderTask task = new BitmapLoaderTask(imgView);
+        LoadedDrawable loadedDrawable = new LoadedDrawable(task);
+        imgView.setImageDrawable(loadedDrawable);
+        imgView.setMinimumHeight(156);
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,file.getPath());
     }
     private class LoadedDrawable extends BitmapDrawable {
         private final WeakReference<BitmapLoaderTask> bitmapLoaderTaskReference;
@@ -245,7 +230,7 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         }
         return null;
     }
-    class BitmapLoaderTask extends AsyncTask<URI, Void, Bitmap> {
+    class BitmapLoaderTask extends AsyncTask<String, Void, Bitmap> {
         private URL urlRequested ;
         private URL urlDownload ;
         private final WeakReference<ImageView> imageViewReference;
@@ -258,8 +243,13 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
          * Actual download method.
          */
         @Override
-        protected Bitmap doInBackground(URI... params) {
+        protected Bitmap doInBackground(String... fileName) {
             Bitmap resultBitmap = null ;
+
+            if( fileName.length == 0 ) {
+                return null ;
+            }
+            resultBitmap =  BitmapFactory.decodeFile( fileName[0] ) ;
 
             // Téléchargement
             //resultBitmap = downloadBitmap(urlDownload);

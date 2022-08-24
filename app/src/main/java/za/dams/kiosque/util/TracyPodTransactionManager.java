@@ -12,6 +12,11 @@ public class TracyPodTransactionManager {
         public String displayTitle ;
         public String displayCaption ;
     }
+    public static class PhotoModel {
+        public String exampleUrl ;
+
+        public String photoFilename ;
+    }
 
     @SuppressWarnings("unused")
     private static final String TAG = "PARACRM/TracyPodTransactionManager";
@@ -24,11 +29,13 @@ public class TracyPodTransactionManager {
     private Context mContext ;
     private UUID mTransactionUUID = null ;
     private ArrayList<ScanRowModel> mArrScanRows = null ;
+    private ArrayList<PhotoModel> mArrPhotos = null ;
 
     private TracyPodTransactionManager( Context c ) {
         mContext = c ;
         mTransactionUUID = null ;
         mArrScanRows = new ArrayList<ScanRowModel>() ;
+        mArrPhotos = new ArrayList<PhotoModel>() ;
     }
     private TracyPodTransactionManager( Context c , JSONObject jsonObject ) {
         mContext = c ;
@@ -102,6 +109,9 @@ public class TracyPodTransactionManager {
     public ArrayList<ScanRowModel> getArrScanRows() {
         return mArrScanRows ;
     }
+    public ArrayList<PhotoModel> getArrPhotos() {
+        return mArrPhotos ;
+    }
     public void addDummy() {
         int i = mArrScanRows.size();
 
@@ -112,6 +122,24 @@ public class TracyPodTransactionManager {
 
         onSave();
     }
+
+
+    public void addPhoto(PhotoModel tmpPhoto) {
+        PhotoModel newPhoto = new PhotoModel();
+        newPhoto.photoFilename = tmpPhoto.photoFilename ;
+        mArrPhotos.add(newPhoto) ;
+    }
+    public void pushExamplePhotos() {
+        mArrPhotos.clear();
+        for( int i=0 ; i<19 ; i++ ) {
+            int picIdx = i%3 + 1 ;
+            String url= "https://10-39-10-205.int.mirabel-sil.com/tmp/dl.php?pic="+picIdx ;
+            PhotoModel newPhoto = new PhotoModel();
+            newPhoto.exampleUrl = url ;
+            mArrPhotos.add(newPhoto) ;
+        }
+    }
+
     private boolean isEmpty() {
         if( mArrScanRows.size() > 0 ) {
             return false ;

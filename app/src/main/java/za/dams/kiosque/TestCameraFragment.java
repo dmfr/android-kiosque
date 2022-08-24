@@ -10,14 +10,13 @@ import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
-
-import android.app.Fragment;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -33,9 +32,12 @@ import android.view.Window;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import za.dams.kiosque.util.TracyPodTransactionManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -165,51 +167,77 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
         mProgressDialog = ProgressDialog.show(getActivity(), "",
                 "Loading. Please wait...", true);
 
-        ImageCapture.OutputFileOptions outputFileOptions =
-                new ImageCapture.OutputFileOptions.Builder(new File(getContext().getFilesDir(), "testFilename.jpg")).build();
-        imageCapture.takePicture(outputFileOptions, Executors.newSingleThreadExecutor(),
-                new ImageCapture.OnImageSavedCallback() {
-                    @Override
-                    public void onImageSaved(ImageCapture.OutputFileResults outputFileResults) {
-                        // insert your code here.
-                        try {
-                            Thread.sleep(2000);
-                        } catch( Exception e ) {
+        try {
+            File outputDir = getContext().getCacheDir(); // context being the Activity pointer
+            File outputFile = File.createTempFile("tracyPodCamera", ".jpg", outputDir);
+            ImageCapture.OutputFileOptions outputFileOptions =
+                    new ImageCapture.OutputFileOptions.Builder(outputFile).build();
+            imageCapture.takePicture(outputFileOptions, Executors.newSingleThreadExecutor(),
+                    new ImageCapture.OnImageSavedCallback() {
+                        @Override
+                        public void onImageSaved(ImageCapture.OutputFileResults outputFileResults) {
+                            // insert your code here.
+                            try {
+                                Thread.sleep(2000);
+                            } catch (Exception e) {
 
-                        }
-                        boolean isCheck = (Looper.myLooper() == Looper.getMainLooper()) ;
-                        if( isCheck ) {
-                            Log.w("DAMS", "Main thread");
-                        } else {
-                            Log.w("DAMS", "Not main thread");
-                        }
-                        try {
-                            Thread.sleep(2000);
-                        } catch( Exception e ) {
-
-                        }
-
-                        // Get a handler that can be used to post to the main thread
-                        Handler mainHandler = new Handler(TestCameraFragment.this.getActivity().getMainLooper());
-                        Runnable myRunnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                if (TestCameraFragment.this.mProgressDialog != null) {
-                                    mProgressDialog.cancel();
-                                }
-                                TestCameraFragment.this.dismiss();
                             }
-                        };
-                        mainHandler.post(myRunnable);
+                            boolean isCheck = (Looper.myLooper() == Looper.getMainLooper());
+                            if (isCheck) {
+                                Log.w("DAMS", "Main thread");
+                            } else {
+                                Log.w("DAMS", "Not main thread");
+                            }
+
+                            String fileName = outputFile.getName() ;
+                            TracyPodTransactionManager.PhotoModel newPhoto = new TracyPodTransactionManager.PhotoModel();
+                            newPhoto.photoFilename = fileName ;
+                            TracyPodTransactionManager.getInstance(getContext()).addPhoto(newPhoto);
+
+
+
+                            try {
+                                Thread.sleep(2000);
+                            } catch (Exception e) {
+
+                            }
+
+
+
+                            // Get a handler that can be used to post to the main thread
+                            Handler mainHandler = new Handler(TestCameraFragment.this.getActivity().getMainLooper());
+                            Runnable myRunnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    onCameraFinish_forMainThread() ;
+                                }
+                            };
+                            mainHandler.post(myRunnable);
+                        }
+
+                        @Override
+                        public void onError(ImageCaptureException exception) {
+
+                        }
+
                     }
+            );
+        } catch (Exception e) {
 
-                    @Override
-                    public void onError(ImageCaptureException exception) {
+        }
+    }
 
-                    }
-
-                }
-        );
+    private void onCameraFinish_forMainThread(){
+        if (mProgressDialog != null) {
+            mProgressDialog.cancel();
+        }
+        if( getTargetFragment() != null ) {
+            Fragment targetFragment = getTargetFragment() ;
+            if( targetFragment instanceof TestGalleryFragment ) {
+                ((TestGalleryFragment)targetFragment).onCameraFinish();
+            }
+        }
+        dismiss();
     }
 
 
