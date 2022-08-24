@@ -54,11 +54,6 @@ import za.dams.kiosque.util.TracyPodTransactionManager;
  */
 public class TestCameraFragment extends DialogFragment implements View.OnClickListener {
 
-    public interface CameraListener {
-        void onCameraResult(boolean photoTaken);
-    }
-    private CameraListener mListener ;
-
     private static final class MainThreadExecutor implements Executor {
         static final Executor INSTANCE = new MainThreadExecutor();
 
@@ -82,10 +77,6 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
     public static TestCameraFragment newInstance() {
         TestCameraFragment fragment = new TestCameraFragment();
         return fragment;
-    }
-
-    public void setListener( CameraListener cl ) {
-        mListener = cl ;
     }
 
     @Override
