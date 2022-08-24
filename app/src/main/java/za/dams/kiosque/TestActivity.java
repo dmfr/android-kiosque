@@ -89,6 +89,22 @@ public class TestActivity extends FragmentActivity {
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mViewPager.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(),
                 TestActivity.this));
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
@@ -116,10 +132,21 @@ public class TestActivity extends FragmentActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean isScanFragment = (getCurrentFragment() instanceof TestScanFragment) ;
+        menu.findItem(R.id.action_scaninput).setVisible( isScanFragment );
+        menu.findItem(R.id.action_scandummy).setVisible( isScanFragment );
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch( item.getItemId() ) {
-            case R.id.action_test:
-                actionTest();
+            case R.id.action_scaninput:
+                actionScanInput();
+                break;
+            case R.id.action_scandummy:
+                actionScanDummy();
                 break;
             default:
                 break;
@@ -128,14 +155,21 @@ public class TestActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
     private Fragment getCurrentFragment() {
         Fragment page = getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewpager + ":" + mViewPager.getCurrentItem());
         return page ;
     }
-    private void actionTest() {
+    private void actionScanInput() {
         Fragment page = getCurrentFragment() ;
         if( page != null && page instanceof TestScanFragment ) {
-            Log.w("DAMS","TestScanFragment !!!!") ;
+            ((TestScanFragment) page).openInputDialog();
+        }
+    }
+    private void actionScanDummy() {
+        Fragment page = getCurrentFragment() ;
+        if( page != null && page instanceof TestScanFragment ) {
             ((TestScanFragment) page).addDummy();
         }
 

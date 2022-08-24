@@ -1,6 +1,8 @@
 package za.dams.kiosque;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -158,7 +161,6 @@ public class TestScanFragment extends Fragment {
     }
 
     public void addDummy() {
-
         ScanListAdapter sla = ((ScanListAdapter)((ListView)mListView).getAdapter()) ;
         if( sla == null ) {
             Log.w("DAMS","???") ;
@@ -166,29 +168,39 @@ public class TestScanFragment extends Fragment {
         }
         sla.addDummy() ;
     }
+    public void openInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("(Debug) Input scan value");
+        // I'm using fragment here so I'm using getView() to provide ViewGroup
+        // but you can provide here any other instance of ViewGroup from your Fragment / Activity
+        View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_scan_input, (ViewGroup) getView(), false);
+        // Set up the input
+        final EditText input = (EditText) viewInflated.findViewById(R.id.input);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        builder.setView(viewInflated);
 
-    private void fillList() {
-        /*
-        ArrayList<TracyPodTransactionManager.LinkModel> data = new ArrayList<TracyPodTransactionManager.LinkModel>();
+        // Set up the buttons
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                setInputValue( input.getText().toString() ) ;
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
 
-        TracyPodTransactionManager.LinkModel lm ;
-        for( int i=0 ; i<4 ; i++) {
-            lm = new TracyPodTransactionManager.LinkModel() ;
-            lm.name = "103986425 / 449766 "+"("+i+")";
-            lm.urlBase = "AIRBUS LOGISTIK GMBH";
-            lm.isProd = (i%2==0);
-            data.add(lm);
-        }
-        */
-
-        //setListShown(true) ;
-        //getListView().setOnItemClickListener(adapter);
-
+        builder.show();
     }
-    private void setText(View view, int id, String text) {
-        TextView textView = (TextView) view.findViewById(id);
-        textView.setText(text);
+    public void setInputValue(String inputValue) {
+        Log.w("DAMS","Dummy scan value : "+inputValue) ;
     }
+
+
 
     private void onLinkClicked(TracyPodTransactionManager.ScanRowModel clickedLink) {
         Log.w("DAMS","pouet pouet");

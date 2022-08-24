@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="za.dams.kiosque.MainActivity">
     <item
-        android:id="@+id/action_test"
+        android:id="@+id/action_scaninput"
         android:orderInCategory="100"
-        android:title="TEST !"
+        android:title="(Debug) Input scan value"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_dummy"
-        android:orderInCategory="900"
-        android:title="Dummy"
+        android:id="@+id/action_scandummy"
+        android:orderInCategory="100"
+        android:title="(Hack) Dummy item"
         app:showAsAction="never" />
 </menu>
