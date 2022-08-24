@@ -112,11 +112,18 @@ public class TracyPodTransactionManager {
     public ArrayList<PhotoModel> getArrPhotos() {
         return mArrPhotos ;
     }
+
     public void addDummy() {
-        int i = mArrScanRows.size();
+        addDummy(null) ;
+    }
+    public void addDummy(String scan) {
+        if( scan == null ) {
+            int i = mArrScanRows.size() + 1 ;
+            scan = ""+i ;
+        }
 
         ScanRowModel newRow = new ScanRowModel() ;
-        newRow.displayTitle = "103986425 / 449766 "+"("+i+")" ;
+        newRow.displayTitle = "103986425 / 449766 "+"("+scan+")" ;
         newRow.displayCaption = "AIRBUS LOGISTIK GMBH" ;
         mArrScanRows.add( newRow ) ;
 

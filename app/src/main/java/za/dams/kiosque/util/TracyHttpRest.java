@@ -10,7 +10,14 @@ import java.net.URL;
 
 import za.dams.kiosque.R;
 
+
+
 public class TracyHttpRest {
+    public static class TracyHttpScanResponse {
+        String scanQueryString ;
+        boolean isValid ;
+    }
+
     private static HttpURLConnection getHttpTracyConnection( Context c, String path ) throws Exception {
         String android_id = Settings.Secure.getString(c.getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -33,7 +40,7 @@ public class TracyHttpRest {
             HttpURLConnection httpConnection = getHttpTracyConnection(c,"/pod-ping");
             int respCode = httpConnection.getResponseCode() ;
             Log.w("DAMS","Response code is "+respCode) ;
-            if( (respCode >= 200) && (respCode < 300) ) {
+            if( respCode==204 ) {
                 accepted = true ;
             }
 
@@ -41,5 +48,25 @@ public class TracyHttpRest {
 
         }
         return accepted ;
+    }
+    public static TracyHttpScanResponse scanQuery(Context c, String queryString) {
+        String respMsg = null ;
+        try {
+            HttpURLConnection httpConnection = getHttpTracyConnection(c,"/pod-scan");
+            int respCode = httpConnection.getResponseCode() ;
+            respMsg = httpConnection.getResponseMessage() ;
+            Log.w("DAMS","Response code is "+respCode) ;
+            if( respCode != 200 ) {
+                return null ;
+            }
+        } catch(Exception e) {
+
+        }
+
+        Log.w("DAMS","Message is : "+respMsg);
+
+        TracyHttpScanResponse resp = new TracyHttpRest.TracyHttpScanResponse() ;
+        resp.isValid = true ;
+        return resp ;
     }
 }

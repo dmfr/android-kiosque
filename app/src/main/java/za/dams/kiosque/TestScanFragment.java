@@ -1,10 +1,14 @@
 package za.dams.kiosque;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.drawable.ShapeDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -20,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,9 +34,13 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
+import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import za.dams.kiosque.util.SimpleImageLoader;
+import za.dams.kiosque.util.TracyHttpRest;
 import za.dams.kiosque.util.TracyPodTransactionManager;
 
 /**
@@ -53,6 +62,9 @@ public class TestScanFragment extends Fragment {
 
     DecoratedBarcodeView barcodeView;
     ViewGroup mListView ;
+
+    boolean onForeground = false ;
+    protected ProgressDialog mProgressDialog;
 
     private BarcodeCallback callback = new BarcodeCallback() {
         @Override
@@ -149,6 +161,7 @@ public class TestScanFragment extends Fragment {
 
     @Override
     public void onPause() {
+        onForeground = false ;
         super.onPause();
         transactionDoSave() ;
         barcodeView.pauseAndWait();
@@ -157,7 +170,16 @@ public class TestScanFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        onForeground = true ;
         barcodeView.resume();
+    }
+
+    private void doRefresh() {
+        ScanListAdapter sla = ((ScanListAdapter)((ListView)mListView).getAdapter()) ;
+        if( sla == null ) {
+            return ;
+        }
+        sla.notifyDataSetChanged();
     }
 
     public void addDummy() {
@@ -196,10 +218,16 @@ public class TestScanFragment extends Fragment {
 
         builder.show();
     }
-    public void setInputValue(String inputValue) {
+    private void setInputValue(String inputValue) {
         Log.w("DAMS","Dummy scan value : "+inputValue) ;
+        doQueryScan(inputValue) ;
     }
 
+
+    private void doQueryScan( String queryScan ) {
+        ScanQueryTask task = new ScanQueryTask(this.getContext());
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,queryScan);
+    }
 
 
     private void onLinkClicked(TracyPodTransactionManager.ScanRowModel clickedLink) {
@@ -311,6 +339,65 @@ public class TestScanFragment extends Fragment {
         public void addDummy() {
             mTracyPodTransactionManager.addDummy();
             notifyDataSetChanged();
+        }
+    }
+
+    class ScanQueryTask extends AsyncTask<String, Void, TracyHttpRest.TracyHttpScanResponse> {
+        private Context mContext ;
+        private String queryString ;
+
+        public ScanQueryTask(Context c) {
+            mContext = c.getApplicationContext() ;
+        }
+
+        @Override
+        protected void onPreExecute(){
+            if( onForeground ) {
+                mProgressDialog = ProgressDialog.show(
+                        TestScanFragment.this.getContext(),
+                        "Scan query",
+                        "Please wait...",
+                        true);
+            }
+        }
+
+        @Override
+        protected TracyHttpRest.TracyHttpScanResponse doInBackground(String... scanQuery) {
+            try {
+                Thread.sleep(200) ;
+            } catch( Exception e ) {
+
+            }
+            if( scanQuery.length == 0 ) {
+                return null ;
+            }
+            queryString = scanQuery[0] ;
+
+            return TracyHttpRest.scanQuery(mContext, queryString) ;
+        }
+
+        @Override
+        protected void onPostExecute(TracyHttpRest.TracyHttpScanResponse scanResponse) {
+            if( scanResponse != null ) {
+                TracyPodTransactionManager.getInstance(mContext).addDummy(queryString);
+                doRefresh() ;
+            }
+            if( mProgressDialog != null ) {
+                mProgressDialog.dismiss() ;
+            }
+            if( scanResponse == null ) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TestScanFragment.this.getContext());
+                builder.setTitle("Scan rejected")
+                        .setMessage("Query <"+queryString+"> not accepted")
+                        .setCancelable(false)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
         }
     }
 
