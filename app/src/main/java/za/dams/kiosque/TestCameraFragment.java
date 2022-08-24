@@ -6,6 +6,7 @@ import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -15,7 +16,11 @@ import androidx.lifecycle.LifecycleOwner;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
+import android.media.ExifInterface;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -32,7 +37,10 @@ import android.view.Window;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -137,6 +145,8 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, imageCapture, preview);
     }
 
+
+
     @Override
     public void onResume() {
         // Set the width of the dialog proportional to 90% of the screen width
@@ -167,67 +177,91 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
         mProgressDialog = ProgressDialog.show(getActivity(), "",
                 "Loading. Please wait...", true);
 
-        try {
-            File outputDir = getContext().getCacheDir(); // context being the Activity pointer
-            File outputFile = File.createTempFile("tracyPodCamera", ".jpg", outputDir);
-            ImageCapture.OutputFileOptions outputFileOptions =
-                    new ImageCapture.OutputFileOptions.Builder(outputFile).build();
-            imageCapture.takePicture(outputFileOptions, Executors.newSingleThreadExecutor(),
-                    new ImageCapture.OnImageSavedCallback() {
-                        @Override
-                        public void onImageSaved(ImageCapture.OutputFileResults outputFileResults) {
-                            // insert your code here.
-                            try {
-                                Thread.sleep(2000);
-                            } catch (Exception e) {
+        imageCapture.takePicture(Executors.newSingleThreadExecutor(),
+                new ImageCapture.OnImageCapturedCallback() {
+                    @Override
+                    public void onCaptureSuccess(ImageProxy image) {
+                        super.onCaptureSuccess(image);
 
-                            }
-                            boolean isCheck = (Looper.myLooper() == Looper.getMainLooper());
-                            if (isCheck) {
-                                Log.w("DAMS", "Main thread");
-                            } else {
-                                Log.w("DAMS", "Not main thread");
-                            }
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception e) {
+
+                        }
+
+                        Bitmap bitmap = imageProxyToBitmap(image) ;
+                        bitmap = rotateImage(bitmap, image.getImageInfo().getRotationDegrees()) ;
+
+                        try {
+                            File outputDir = getContext().getCacheDir(); // context being the Activity pointer
+                            File outputFile = File.createTempFile("tracyPodCamera", ".jpg", outputDir);
+                            FileOutputStream out = new FileOutputStream(outputFile);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
 
                             String fileName = outputFile.getName() ;
                             TracyPodTransactionManager.PhotoModel newPhoto = new TracyPodTransactionManager.PhotoModel();
                             newPhoto.photoFilename = fileName ;
                             TracyPodTransactionManager.getInstance(getContext()).addPhoto(newPhoto);
-
-
-
-                            try {
-                                Thread.sleep(2000);
-                            } catch (Exception e) {
-
-                            }
-
-
-
-                            // Get a handler that can be used to post to the main thread
-                            Handler mainHandler = new Handler(TestCameraFragment.this.getActivity().getMainLooper());
-                            Runnable myRunnable = new Runnable() {
-                                @Override
-                                public void run() {
-                                    onCameraFinish_forMainThread() ;
-                                }
-                            };
-                            mainHandler.post(myRunnable);
-                        }
-
-                        @Override
-                        public void onError(ImageCaptureException exception) {
+                        } catch (Exception e) {
 
                         }
 
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception e) {
+
+                        }
+
+                        onCameraFinish();
                     }
-            );
-        } catch (Exception e) {
 
-        }
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                        super.onError(exception);
+
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception e) {
+
+                        }
+
+                        onCameraFinish();
+                    }
+                }) ;
+    }
+
+    private Bitmap imageProxyToBitmap(ImageProxy image) {
+        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        return BitmapFactory.decodeByteArray(bytes,0,bytes.length,null);
+    }
+    private static Bitmap rotateImage(Bitmap img, int degree)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
     }
 
     private void onCameraFinish_forMainThread(){
+        // Get a handler that can be used to post to the main thread
+        Handler mainHandler = new Handler(getActivity().getMainLooper());
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                onCameraFinish() ;
+            }
+        };
+        mainHandler.post(myRunnable);
+    }
+    private void onCameraFinish(){
+        boolean isMainThread = (Looper.myLooper() == Looper.getMainLooper());
+        if( !isMainThread ) {
+            onCameraFinish_forMainThread() ;
+            return ;
+        }
         if (mProgressDialog != null) {
             mProgressDialog.cancel();
         }
