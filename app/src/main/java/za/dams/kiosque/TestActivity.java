@@ -1,9 +1,13 @@
 package za.dams.kiosque;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,11 +23,13 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.UUID;
 
+import za.dams.kiosque.util.TracyHttpRest;
 import za.dams.kiosque.util.TracyPodTransactionManager;
 
 public class TestActivity extends FragmentActivity {
 
     ViewPager mViewPager ;
+    private Thread asyncSanityCheker ;
 
     private class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
         final int PAGE_COUNT = 3;
@@ -70,6 +76,32 @@ public class TestActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if( savedInstanceState == null ) {
+            Log.w("DAMS", "AsyncCheck !!!");
+            // Async check
+            asyncSanityCheker = new Thread() {
+                public void run() {
+                    boolean checkResult = asyncSanityCheck() ;
+                    if( isInterrupted() ) {
+                        return ;
+                    }
+                    if( checkResult ) {
+                        return;
+                    }
+
+                    Handler mainHandler = new Handler(getMainLooper());
+                    Runnable myRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            quitDenied();
+                        }
+                    };
+                    mainHandler.post(myRunnable);
+                };
+            };
+            asyncSanityCheker.start();
+        }
 
         Log.w("DAMS","TestActivity create") ;
         TracyPodTransactionManager tracyPod = TracyPodTransactionManager.getInstance(this) ;
@@ -122,6 +154,14 @@ public class TestActivity extends FragmentActivity {
 
         }
          */
+    }
+
+    @Override
+    protected void onDestroy() {
+        if( asyncSanityCheker != null ) {
+            asyncSanityCheker.interrupt();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -181,7 +221,31 @@ public class TestActivity extends FragmentActivity {
 
 
 
+    private boolean asyncSanityCheck() {
+        try {
+            Thread.sleep(500);
+        } catch( Exception e ) {
 
+        }
+        return TracyHttpRest.sendPing(this) ;
+    }
+    private void quitDenied() {
+        String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
+        builder.setTitle("Authentication error")
+                .setMessage("This device is not authorized on currently defined service.\nPlease contact support with ANDROID_ID="+android_id)
+                .setCancelable(false)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        TestActivity.this.finish() ;
+                        return ;
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
 
 }

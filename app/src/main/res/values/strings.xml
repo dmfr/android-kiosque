@@ -16,4 +16,6 @@
     <string name="datawedge_intent_key_data">com.symbol.datawedge.data_string</string>
 
     <color name="mygray">#EEEEEE</color>
+
+    <string name="tracy_rest_baseurl">https://10-39-10-205.int.mirabel-sil.com/paracrm.master/rest/tracy</string>
 </resources>
