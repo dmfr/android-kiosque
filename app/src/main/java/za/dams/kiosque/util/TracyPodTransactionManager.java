@@ -125,7 +125,7 @@ public class TracyPodTransactionManager {
         ScanRowModel newRow = new ScanRowModel() ;
         newRow.displayTitle = "103986425 / 449766 "+"("+scan+")" ;
         newRow.displayCaption = "AIRBUS LOGISTIK GMBH" ;
-        mArrScanRows.add( newRow ) ;
+        mArrScanRows.add( 0, newRow ) ;
 
         onSave();
     }
@@ -134,7 +134,7 @@ public class TracyPodTransactionManager {
     public void addPhoto(PhotoModel tmpPhoto) {
         PhotoModel newPhoto = new PhotoModel();
         newPhoto.photoFilename = tmpPhoto.photoFilename ;
-        mArrPhotos.add(newPhoto) ;
+        mArrPhotos.add(0,newPhoto) ;
     }
     public void pushExamplePhotos() {
         mArrPhotos.clear();
