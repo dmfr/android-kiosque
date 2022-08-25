@@ -130,7 +130,7 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
 
         imageCapture =
                 new ImageCapture.Builder()
-                        .setTargetRotation(getView().getDisplay().getRotation())
+                        .setTargetRotation(getActivity().getWindowManager().getDefaultDisplay().getRotation())
                         .build();
 
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, imageCapture, preview);
