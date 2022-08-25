@@ -174,12 +174,6 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
                     public void onCaptureSuccess(ImageProxy image) {
                         super.onCaptureSuccess(image);
 
-                        try {
-                            Thread.sleep(500);
-                        } catch (Exception e) {
-
-                        }
-
                         Bitmap bitmap = imageProxyToBitmap(image) ;
                         bitmap = rotateImage(bitmap, image.getImageInfo().getRotationDegrees()) ;
 
@@ -198,7 +192,7 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
                         }
 
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(250);
                         } catch (Exception e) {
 
                         }
@@ -211,7 +205,7 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
                         super.onError(exception);
 
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(300);
                         } catch (Exception e) {
 
                         }

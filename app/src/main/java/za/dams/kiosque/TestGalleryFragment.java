@@ -45,16 +45,8 @@ import za.dams.kiosque.util.TracyPodTransactionManager;
  */
 public class TestGalleryFragment extends Fragment implements View.OnClickListener {
 
-    // Array of integers points to images stored in /res/drawable-ldpi/
-    int[] images = new int[]{
-            R.drawable.gallery1,
-            R.drawable.gallery2,
-            R.drawable.gallery3
-    };
-
     private static final int RES_LOADING = R.drawable.ic_explorer_fileicon ;
     private Context mContext ;
-    private Bitmap mBitmapLoading ;
 
     private View mFab ;
 
@@ -62,16 +54,7 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DummyFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static TestGalleryFragment newInstance(String param1, String param2) {
+    public static TestGalleryFragment newInstance() {
         TestGalleryFragment fragment = new TestGalleryFragment();
         return fragment;
     }
@@ -99,7 +82,6 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         super.onActivityCreated(savedInstanceState);
 
         mContext = getActivity().getApplicationContext() ;
-        mBitmapLoading = ((BitmapDrawable)mContext.getResources().getDrawable(RES_LOADING)).getBitmap() ;
 
         GridView mgv = (GridView) getView().findViewById(R.id.galleryview);
         mgv.post(new Runnable() {
@@ -108,7 +90,7 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
                 int width = mgv.getMeasuredWidth() ;
                 int cols = mgv.getNumColumns() ;
                 int targetWidth = width/cols ;
-                Log.w("DAMS","Target width is "+ (width/cols)) ;
+                //Log.w("DAMS","Target width is "+ (width/cols)) ;
 
                 MediaAdapter gridAdapter = new MediaAdapter(getActivity().getApplicationContext(),targetWidth);
                 mgv.setAdapter(gridAdapter);
@@ -123,7 +105,6 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         if( v==mFab ) {
-            Log.w("DAMS","Floating button clicked") ;
             FragmentManager fm = getFragmentManager() ;
             TestCameraFragment f = TestCameraFragment.newInstance() ;
             f.setTargetFragment(this,1);
@@ -134,7 +115,6 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         GridView gv = (GridView)getView().findViewById(R.id.galleryview) ;
         if( gv != null ) {
             ((MediaAdapter)gv.getAdapter()).notifyDataSetChanged();
-            Log.w("DAMS","Adapter count "+((MediaAdapter)gv.getAdapter()).getCount()) ;
         }
     }
 
@@ -192,7 +172,6 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Log.w("DAMS","Target width: "+mTargetWidth) ;
 
             if (position >= getCount()) {
                 return null;
@@ -219,9 +198,6 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
     }
 
 
-    /*
-    Dummy async load inspired from SimpleImageLoader
-     */
     private void ayncloadThumb( String filename, ImageView imgView, int targetWidth ) {
         File file = new File(getContext().getCacheDir(),filename) ;
 
@@ -232,8 +208,6 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,file.getPath());
     }
     class BitmapLoaderTask extends AsyncTask<String, Void, Bitmap> {
-        private URL urlRequested ;
-        private URL urlDownload ;
         private final WeakReference<ImageView> imageViewReference;
 
         private int targetWidth ;
@@ -243,9 +217,6 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
             targetWidth = tw ;
         }
 
-        /**
-         * Actual download method.
-         */
         @Override
         protected Bitmap doInBackground(String... fileName) {
             Bitmap resultBitmap = null ;
@@ -265,9 +236,6 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
             return null ;
         }
 
-        /**
-         * Once the image is downloaded, associates it to the imageView
-         */
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             if (isCancelled()) {
