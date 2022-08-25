@@ -135,6 +135,8 @@ public class TracyPodTransactionManager {
         PhotoModel newPhoto = new PhotoModel();
         newPhoto.photoFilename = tmpPhoto.photoFilename ;
         mArrPhotos.add(0,newPhoto) ;
+
+        onSave();
     }
     public void pushExamplePhotos() {
         mArrPhotos.clear();
