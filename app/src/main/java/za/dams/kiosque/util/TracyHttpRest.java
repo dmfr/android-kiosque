@@ -34,10 +34,11 @@ public class TracyHttpRest {
 
         return httpConnection ;
     }
-    public static boolean sendPing(Context c) {
+    public static boolean sendPing(Context c) throws Exception {
         boolean accepted = false ;
         try {
             HttpURLConnection httpConnection = getHttpTracyConnection(c,"/pod-ping");
+            httpConnection.setConnectTimeout(5*1000);
             int respCode = httpConnection.getResponseCode() ;
             Log.w("DAMS","Response code is "+respCode) ;
             if( respCode==204 ) {
@@ -45,7 +46,7 @@ public class TracyHttpRest {
             }
 
         } catch(Exception e) {
-
+            throw e ;
         }
         return accepted ;
     }

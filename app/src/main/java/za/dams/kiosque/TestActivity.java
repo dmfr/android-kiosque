@@ -82,7 +82,13 @@ public class TestActivity extends FragmentActivity {
             // Async check
             asyncSanityCheker = new Thread() {
                 public void run() {
-                    boolean checkResult = asyncSanityCheck() ;
+                    boolean connectionFailed = false ;
+                    boolean checkResult = false ;
+                    try {
+                        checkResult = asyncSanityCheck() ;
+                    } catch(Exception e) {
+                        connectionFailed = true ;
+                    }
                     if( isInterrupted() ) {
                         return ;
                     }
@@ -90,11 +96,16 @@ public class TestActivity extends FragmentActivity {
                         return;
                     }
 
+                    final boolean fConnectionFailed = connectionFailed ;
                     Handler mainHandler = new Handler(getMainLooper());
                     Runnable myRunnable = new Runnable() {
                         @Override
                         public void run() {
-                            quitDenied();
+                            if( fConnectionFailed ) {
+                                quitDenied(false);
+                                return ;
+                            }
+                            quitDenied(true);
                         }
                     };
                     mainHandler.post(myRunnable);
@@ -221,7 +232,7 @@ public class TestActivity extends FragmentActivity {
 
 
 
-    private boolean asyncSanityCheck() {
+    private boolean asyncSanityCheck() throws Exception {
         try {
             Thread.sleep(500);
         } catch( Exception e ) {
@@ -229,12 +240,15 @@ public class TestActivity extends FragmentActivity {
         }
         return TracyHttpRest.sendPing(this) ;
     }
-    private void quitDenied() {
+    private void quitDenied( boolean isDenied ) {
         String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
+        String title = isDenied ? "Authentication error" : "Connection error" ;
+        String caption = isDenied ? "This device is not authorized on currently defined service.\nPlease contact support with ANDROID_ID="+android_id : "Server unreachable" ;
+
         AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
-        builder.setTitle("Authentication error")
-                .setMessage("This device is not authorized on currently defined service.\nPlease contact support with ANDROID_ID="+android_id)
+        builder.setTitle(title)
+                .setMessage(caption)
                 .setCancelable(false)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
