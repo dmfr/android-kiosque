@@ -102,8 +102,21 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
         mBitmapLoading = ((BitmapDrawable)mContext.getResources().getDrawable(RES_LOADING)).getBitmap() ;
 
         GridView mgv = (GridView) getView().findViewById(R.id.galleryview);
-        MediaAdapter gridAdapter = new MediaAdapter(getActivity().getApplicationContext());
-        mgv.setAdapter(gridAdapter);
+        mgv.post(new Runnable() {
+            @Override
+            public void run() {
+                int width = mgv.getMeasuredWidth() ;
+                int cols = mgv.getNumColumns() ;
+                int targetWidth = width/cols ;
+                Log.w("DAMS","Target width is "+ (width/cols)) ;
+
+                MediaAdapter gridAdapter = new MediaAdapter(getActivity().getApplicationContext(),targetWidth);
+                mgv.setAdapter(gridAdapter);
+            }
+        });
+
+
+
     }
 
 
@@ -128,20 +141,22 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
     private class MediaAdapter extends BaseAdapter {
 
         Context mAdapterContext ;
+        int mTargetWidth ;
 
         LayoutInflater mInflater ;
         TracyPodTransactionManager mTracyPodTransactionManager ;
 
         SimpleImageLoader mSimpleImageLoader ;
 
-        public MediaAdapter( Context c ) {
+        public MediaAdapter( Context c, int targetWidth ) {
             super() ;
             mAdapterContext = c.getApplicationContext() ;
             mInflater = (LayoutInflater) c.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
             mSimpleImageLoader = new SimpleImageLoader(mAdapterContext) ;
             mTracyPodTransactionManager = TracyPodTransactionManager.getInstance(c) ;
-        }
 
+            mTargetWidth = targetWidth ;
+        }
 
         @Override
         public int getCount() {
@@ -167,11 +182,17 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
             if (position >= getCount()) {
                 return 0;
             }
-            return position ;
+            return getItem(position).photoFilename.hashCode() ;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true ;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            Log.w("DAMS","Target width: "+mTargetWidth) ;
 
             if (position >= getCount()) {
                 return null;
@@ -179,16 +200,19 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
 
             TracyPodTransactionManager.PhotoModel photoRow = getItem(position) ;
 
-            if( convertView==null ) {
-                convertView = mInflater.inflate(R.layout.gallery_item, null) ;
+            if( convertView!=null && (convertView.getTag() == photoRow.photoFilename) ) {
+                return convertView ;
             }
 
+            convertView = mInflater.inflate(R.layout.gallery_item, null) ;
             ImageView imgView = (ImageView)convertView.findViewById(R.id.galleryitem) ;
             if( photoRow.exampleUrl != null ) {
                 mSimpleImageLoader.download(photoRow.exampleUrl, imgView);
             } else if( photoRow.photoFilename != null ) {
-                ayncloadThumb(photoRow.photoFilename,imgView) ;
+                ayncloadThumb(photoRow.photoFilename,imgView,mTargetWidth) ;
+                convertView.setTag( photoRow.photoFilename ) ;
             }
+
             return convertView;
         }
 
@@ -198,45 +222,25 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
     /*
     Dummy async load inspired from SimpleImageLoader
      */
-    private void ayncloadThumb( String filename, ImageView imgView ) {
+    private void ayncloadThumb( String filename, ImageView imgView, int targetWidth ) {
         File file = new File(getContext().getCacheDir(),filename) ;
 
-        BitmapLoaderTask task = new BitmapLoaderTask(imgView);
-        LoadedDrawable loadedDrawable = new LoadedDrawable(task);
-        imgView.setImageDrawable(loadedDrawable);
-        imgView.setMinimumHeight(156);
+        BitmapLoaderTask task = new BitmapLoaderTask(imgView,targetWidth);
+        imgView.setImageDrawable(mContext.getResources().getDrawable(RES_LOADING));
+        imgView.setMinimumHeight(64);
+        imgView.setScaleType(ImageView.ScaleType.CENTER) ;
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,file.getPath());
-    }
-    private class LoadedDrawable extends BitmapDrawable {
-        private final WeakReference<BitmapLoaderTask> bitmapLoaderTaskReference;
-
-        public LoadedDrawable(BitmapLoaderTask bitmaploaderTask) {
-            super(mContext.getResources(),mBitmapLoading);
-            bitmapLoaderTaskReference =
-                    new WeakReference<BitmapLoaderTask>(bitmaploaderTask);
-        }
-
-        public BitmapLoaderTask getBitmapLoaderTask() {
-            return bitmapLoaderTaskReference.get();
-        }
-    }
-    private static BitmapLoaderTask getBitmapLoaderTask(ImageView imageView) {
-        if (imageView != null) {
-            Drawable drawable = imageView.getDrawable();
-            if (drawable instanceof LoadedDrawable) {
-                LoadedDrawable loadedDrawable = (LoadedDrawable)drawable;
-                return loadedDrawable.getBitmapLoaderTask();
-            }
-        }
-        return null;
     }
     class BitmapLoaderTask extends AsyncTask<String, Void, Bitmap> {
         private URL urlRequested ;
         private URL urlDownload ;
         private final WeakReference<ImageView> imageViewReference;
 
-        public BitmapLoaderTask(ImageView imageView) {
+        private int targetWidth ;
+
+        public BitmapLoaderTask(ImageView imageView, int tw) {
             imageViewReference = new WeakReference<ImageView>(imageView);
+            targetWidth = tw ;
         }
 
         /**
@@ -251,8 +255,10 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
             }
             resultBitmap =  BitmapFactory.decodeFile( fileName[0] ) ;
 
-            // Téléchargement
-            //resultBitmap = downloadBitmap(urlDownload);
+            if( targetWidth != 0 ) {
+                int targetHeight = targetWidth * resultBitmap.getHeight() / resultBitmap.getWidth() ;
+                resultBitmap = Bitmap.createScaledBitmap(resultBitmap, targetWidth, targetHeight, true) ;
+            }
             if( resultBitmap != null ) {
                 return resultBitmap ;
             }
@@ -270,19 +276,13 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
 
             if (imageViewReference != null) {
                 ImageView imageView = imageViewReference.get();
-                BitmapLoaderTask bitmapLoaderTask = getBitmapLoaderTask(imageView);
-                // Change bitmap only if this process is still associated with it
-                // Or if we don't use any bitmap to task association (NO_DOWNLOADED_DRAWABLE mode)
-                if( this == bitmapLoaderTask ) {
-                    if( bitmap!=null ) {
-                        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                        imageView.setImageBitmap(bitmap);
-                    } else {
-                        imageView.setScaleType(ImageView.ScaleType.CENTER) ;
-                        imageView.setImageBitmap(null);
-                    }
+                if( bitmap!=null ) {
+                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                    imageView.setImageBitmap(bitmap);
+                } else {
+                    imageView.setScaleType(ImageView.ScaleType.CENTER) ;
+                    imageView.setImageBitmap(null);
                 }
-
             }
 
         }
