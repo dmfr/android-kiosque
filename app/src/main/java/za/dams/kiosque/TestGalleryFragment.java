@@ -162,7 +162,13 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
             if (position >= getCount()) {
                 return 0;
             }
-            return getItem(position).photoFilename.hashCode() ;
+            TracyPodTransactionManager.PhotoModel pm = getItem(position) ;
+            if( pm.exampleUrl != null ) {
+                return position ;
+            } else if( pm.photoFilename != null ) {
+                return pm.photoFilename.hashCode() ;
+            }
+            return position ;
         }
 
         @Override
@@ -179,7 +185,8 @@ public class TestGalleryFragment extends Fragment implements View.OnClickListene
 
             TracyPodTransactionManager.PhotoModel photoRow = getItem(position) ;
 
-            if( convertView!=null && (convertView.getTag() == photoRow.photoFilename) ) {
+            if( (convertView!=null) && (convertView.getTag() != null)
+                    && (convertView.getTag() == photoRow.photoFilename) ) {
                 return convertView ;
             }
 

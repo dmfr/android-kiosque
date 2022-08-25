@@ -71,7 +71,7 @@ public class SimpleImageLoader {
      * binding is immediate if the image is found in the cache and will be done asynchronously
      * otherwise. A null bitmap will be associated to the ImageView if an error occurs.
      *
-     * @param url The URL of the image to download.
+     * @param sUrl The URL of the image to download.
      * @param imageView The ImageView to bind the downloaded image to.
      */
     public void download( String sUrl, ImageView imageView) {
@@ -96,7 +96,8 @@ public class SimpleImageLoader {
                 BitmapDownloaderTask task = new BitmapDownloaderTask(imageView);
                 DownloadedDrawable downloadedDrawable = new DownloadedDrawable(task);
                 imageView.setImageDrawable(downloadedDrawable);
-                imageView.setMinimumHeight(156);
+                imageView.setScaleType(ScaleType.CENTER) ;
+                imageView.setMinimumHeight(64);
                 task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,url);
             }
         } else {

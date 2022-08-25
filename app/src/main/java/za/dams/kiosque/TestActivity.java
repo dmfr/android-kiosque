@@ -123,6 +123,16 @@ public class TestActivity extends FragmentActivity {
             Log.w("DAMS", "No transaction UUID");
         }
 
+        // HACK !!!! : test photos
+        if( savedInstanceState == null ) {
+            if( false ) {
+                if (tracyPod.getArrPhotos().size() == 0) {
+                    tracyPod.getArrPhotos().clear();
+                    tracyPod.pushExamplePhotos();
+                }
+            }
+        }
+
         setContentView(R.layout.activity_test);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
