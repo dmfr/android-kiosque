@@ -57,8 +57,16 @@ public class TestScanFragment extends Fragment {
     protected ProgressDialog mProgressDialog;
 
     private BarcodeCallback callback = new BarcodeCallback() {
+        ArrayList<String> lastQueryString = new ArrayList<String>() ;
+
         @Override
         public void barcodeResult(BarcodeResult result) {
+            String queryString = result.getText() ;
+            if( lastQueryString.contains(queryString) ) {
+                return ;
+            }
+            lastQueryString.add(queryString);
+            TestScanFragment.this.doQueryScan(queryString);
         }
 
         @Override
@@ -317,6 +325,8 @@ public class TestScanFragment extends Fragment {
         private Context mContext ;
         private String queryString ;
 
+        private String responseError ;
+
         public ScanQueryTask(Context c) {
             mContext = c.getApplicationContext() ;
         }
@@ -324,6 +334,7 @@ public class TestScanFragment extends Fragment {
         @Override
         protected void onPreExecute(){
             if( onForeground ) {
+                barcodeView.pauseAndWait();
                 mProgressDialog = ProgressDialog.show(
                         TestScanFragment.this.getContext(),
                         "Scan query",
@@ -344,30 +355,49 @@ public class TestScanFragment extends Fragment {
             }
             queryString = scanQuery[0] ;
 
-            return TracyHttpRest.scanQuery(mContext, queryString) ;
+            TracyHttpRest.TracyHttpScanResponse scanResponse = null ;
+            try {
+                scanResponse = TracyHttpRest.scanQuery(mContext, queryString) ;
+            } catch(Exception e) {
+                responseError = e.getMessage() ;
+            }
+
+            return scanResponse ;
         }
 
         @Override
         protected void onPostExecute(TracyHttpRest.TracyHttpScanResponse scanResponse) {
             if( scanResponse != null ) {
-                TracyPodTransactionManager.getInstance(mContext).addDummy(queryString);
+                TracyPodTransactionManager.getInstance(mContext).addScanResponse(scanResponse);
                 doRefresh() ;
             }
             if( mProgressDialog != null ) {
                 mProgressDialog.dismiss() ;
             }
             if( scanResponse == null ) {
+                if( responseError == null ) {
+                    responseError = "Unknown error" ;
+                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(TestScanFragment.this.getContext());
                 builder.setTitle("Scan rejected")
-                        .setMessage("Query <"+queryString+"> not accepted")
+                        .setMessage(responseError)
                         .setCancelable(false)
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                             }
                         });
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        TestScanFragment.this.barcodeView.resume();
+                    }
+                });
+
                 AlertDialog alert = builder.create();
                 alert.show();
+            } else {
+                barcodeView.resume();
             }
         }
     }

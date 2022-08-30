@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,11 +19,19 @@ import android.widget.TextView;
  * Use the {@link TestFormFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TestFormFragment extends Fragment {
+public class TestFormFragment extends Fragment implements View.OnClickListener{
+    private SubmitListener mListener ;
+    public interface SubmitListener {
+        public void onSubmit();
+    }
+    public void setListener(SubmitListener listener) {
+        mListener = listener ;
+    }
 
     private LayoutInflater mInflater ;
 
     ViewGroup mListView ;
+    Button mBtn ;
 
     public TestFormFragment() {
         // Required empty public constructor
@@ -47,7 +56,10 @@ public class TestFormFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_test_form, container, false);
+        View view = inflater.inflate(R.layout.fragment_test_form, container, false);
+        mBtn = (Button)view.findViewById(R.id.btn_submit) ;
+        mBtn.setOnClickListener(this);
+        return view ;
     }
 
     @Override
@@ -61,4 +73,14 @@ public class TestFormFragment extends Fragment {
         TextView textView = (TextView) view.findViewById(id);
         textView.setText(text);
     }
+
+    @Override
+    public void onClick(View v) {
+        if( v==mBtn ) {
+            if( mListener != null ) {
+                mListener.onSubmit();
+            }
+        }
+    }
+
 }

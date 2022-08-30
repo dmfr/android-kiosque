@@ -1,14 +1,24 @@
 package za.dams.kiosque.util;
 
 import android.content.Context;
+import android.util.Base64;
+import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
 public class TracyPodTransactionManager {
     public static class ScanRowModel {
+        public int hatFilerecordId ;
+        public int[] arrCdeFilerecordIds ;
+        public int countParcels ;
+        public String atrConsigneeTxt ;
+
         public String displayTitle ;
         public String displayCaption ;
     }
@@ -130,6 +140,55 @@ public class TracyPodTransactionManager {
         onSave();
     }
 
+    public void addScanResponse( TracyHttpRest.TracyHttpScanResponse resp ) {
+        try {
+            int hatFilerecordId = resp.getInt("hat_filerecord_id") ;
+
+            JSONArray jsonCdes = resp.getJSONArray("cdes") ;
+            int[] cdeFilerecordIds = new int[jsonCdes.length()] ;
+            String cdeIdDn = null ;
+            String atrConsigneeTxt = resp.getString("atr_consignee_txt") ; ;
+            for( int i=0 ; i<jsonCdes.length() ; i++ ) {
+                JSONObject cdeRow = jsonCdes.getJSONObject(i);
+                cdeFilerecordIds[i] = cdeRow.getInt("cde_filerecord_id") ;
+                if( cdeIdDn == null ) {
+                    cdeIdDn = cdeRow.getString("id_dn") ;
+                }
+            }
+
+            String displayTitle = resp.getString("id_hat") ;
+            displayTitle += " / ";
+            if( cdeFilerecordIds.length > 1 ) {
+                displayTitle += cdeIdDn+"+"+" ("+cdeFilerecordIds.length+")" ;
+            } else {
+                displayTitle += cdeIdDn ;
+            }
+
+            String displayCaption = atrConsigneeTxt ;
+
+
+            ScanRowModel newRow = new ScanRowModel();
+            newRow.hatFilerecordId = hatFilerecordId ;
+            newRow.arrCdeFilerecordIds = cdeFilerecordIds ;
+            newRow.atrConsigneeTxt = atrConsigneeTxt ;
+            newRow.displayTitle = displayTitle;
+            newRow.displayCaption = displayCaption;
+
+
+            for( ScanRowModel srm : mArrScanRows ) {
+                if( srm.hatFilerecordId == hatFilerecordId ) {
+                    return ;
+                }
+            }
+
+            mArrScanRows.add(0, newRow);
+            onSave();
+
+        } catch(Exception e) {
+            Log.e("DAMS",e.toString()) ;
+        }
+    }
+
 
     public void addPhoto(PhotoModel tmpPhoto) {
         PhotoModel newPhoto = new PhotoModel();
@@ -163,5 +222,39 @@ public class TracyPodTransactionManager {
         if( mTransactionUUID == null ) {
             mTransactionUUID = UUID.randomUUID() ;
         }
+    }
+
+
+    public JSONObject getFinalTransaction() {
+        try {
+            if (isEmpty() || (mTransactionUUID == null)) {
+                return null;
+            }
+            JSONObject jsonObj = new JSONObject();
+
+            JSONArray jsonArrRows = new JSONArray();
+            for (ScanRowModel scanRow : mArrScanRows) {
+                jsonArrRows.put(scanRow.hatFilerecordId);
+            }
+            jsonObj.put("arrHatFilerecordIds", jsonArrRows);
+
+            JSONArray jsonArrPhotos = new JSONArray();
+            for (PhotoModel photoRow : mArrPhotos) {
+
+                File file = new File(mContext.getCacheDir(),photoRow.photoFilename) ;
+                byte[] buffer = new byte[(int) file.length() + 100];
+                @SuppressWarnings("resource")
+                int length = new FileInputStream(file).read(buffer);
+                String base64 = Base64.encodeToString(buffer, 0, length,
+                        Base64.DEFAULT);
+                jsonArrPhotos.put(base64) ;
+            }
+            jsonObj.put("arrBase64Photos", jsonArrPhotos);
+
+            return jsonObj;
+        } catch(Exception e) {
+
+        }
+        return null ;
     }
 }

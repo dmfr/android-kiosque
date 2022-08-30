@@ -1,6 +1,7 @@
 package za.dams.kiosque;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,15 +22,20 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONObject;
+
 import java.util.UUID;
 
 import za.dams.kiosque.util.TracyHttpRest;
 import za.dams.kiosque.util.TracyPodTransactionManager;
 
-public class TestActivity extends FragmentActivity {
+public class TestActivity extends FragmentActivity implements TestFormFragment.SubmitListener {
 
     ViewPager mViewPager ;
     private Thread asyncSanityCheker ;
+
+    ProgressDialog mProgressDialog;
+
 
     private class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
         final int PAGE_COUNT = 3;
@@ -237,6 +243,15 @@ public class TestActivity extends FragmentActivity {
     }
 
 
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        // https://medium.com/better-programming/proper-fragment-communication-in-android-489fcac520b0
+        //Log.w("DAMS","atacched fragment");
+        if( fragment instanceof TestFormFragment ) {
+            ((TestFormFragment) fragment).setListener(this);
+        }
+
+    }
 
 
 
@@ -271,5 +286,45 @@ public class TestActivity extends FragmentActivity {
         alert.show();
     }
 
+    @Override
+    public void onSubmit() {
+        doTransactionSubmit() ;
+    }
+
+    public void doTransactionSubmit() {
+        mProgressDialog = ProgressDialog.show(
+                this,
+                "Sending transaction",
+                "Please wait...",
+                true);
+        Thread transactionEnd = new Thread() {
+            public void run() {
+                boolean connectionFailed = false ;
+                boolean checkResult = false ;
+
+                //JSONObject jsonObject = TracyPodTransactionManager.getInstance(TestActivity.this).getFinalTransaction() ;
+                //Log.w("DAMS",jsonObject.toString()) ;
+                TracyHttpRest.sendFinalTransaction(TestActivity.this,TracyPodTransactionManager.getInstance(TestActivity.this)) ;
+
+                Handler mainHandler = new Handler(getMainLooper());
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        TestActivity.this.onTransactionEnd();
+                    }
+                };
+                mainHandler.post(myRunnable);
+            };
+        };
+        transactionEnd.start();
+
+    }
+    private void onTransactionEnd() {
+        if( mProgressDialog != null ) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null ;
+        }
+        finish();
+    }
 
 }
