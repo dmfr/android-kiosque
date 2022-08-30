@@ -2,6 +2,7 @@ package za.dams.kiosque;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -26,6 +27,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.util.Size;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -131,6 +133,7 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
         imageCapture =
                 new ImageCapture.Builder()
                         .setTargetRotation(getActivity().getWindowManager().getDefaultDisplay().getRotation())
+                        .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                         .build();
 
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, imageCapture, preview);
@@ -176,6 +179,7 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
 
                         Bitmap bitmap = imageProxyToBitmap(image) ;
                         bitmap = rotateImage(bitmap, image.getImageInfo().getRotationDegrees()) ;
+                        bitmap = resizeImage(bitmap, 1200) ;
 
                         try {
                             File outputDir = getContext().getCacheDir(); // context being the Activity pointer
@@ -228,6 +232,21 @@ public class TestCameraFragment extends DialogFragment implements View.OnClickLi
         Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
         img.recycle();
         return rotatedImg;
+    }
+    private static Bitmap resizeImage(Bitmap img, int maxDimension) {
+        if( maxDimension <= 0 ) {
+            return img ;
+        }
+        float resizingRatio = (float)maxDimension / Math.max(img.getWidth(),img.getHeight()) ;
+        if( resizingRatio >= 1 ) {
+            return img ;
+        }
+        int targetWidth = (int)(img.getWidth() * resizingRatio) ;
+        int targetHeight = (int)(img.getHeight() * resizingRatio) ;
+        //Log.w("DAMS","Resize coef = "+resizingRatio) ;
+        //Log.w("DAMS", "Target size "+targetWidth+ " "+targetHeight) ;
+        Bitmap resizedImg = Bitmap.createScaledBitmap(img, targetWidth, targetHeight, true) ;
+        return resizedImg ;
     }
 
     private void onCameraFinish_forMainThread(){
