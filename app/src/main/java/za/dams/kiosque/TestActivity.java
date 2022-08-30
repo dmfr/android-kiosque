@@ -1,19 +1,23 @@
 package za.dams.kiosque;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity ;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -30,6 +34,7 @@ import za.dams.kiosque.util.TracyHttpRest;
 import za.dams.kiosque.util.TracyPodTransactionManager;
 
 public class TestActivity extends FragmentActivity implements TestFormFragment.SubmitListener {
+    private static final int REQUEST_CAMERA_PERMISSION = 200;
 
     ViewPager mViewPager ;
     private Thread asyncSanityCheker ;
@@ -181,6 +186,24 @@ public class TestActivity extends FragmentActivity implements TestFormFragment.S
 
         }
          */
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(TestActivity.this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            return;
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                // close the app
+                Toast.makeText(TestActivity.this, "Sorry!!!, you can't use this app without granting permission", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
     }
 
     @Override
