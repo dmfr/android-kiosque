@@ -129,6 +129,7 @@ public class TestScanFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        onForeground = isVisibleToUser ;
         if(barcodeView != null) {
             if (isVisibleToUser) {
                 barcodeView.resume();
@@ -138,19 +139,20 @@ public class TestScanFragment extends Fragment {
         }
     }
 
+
+
     @Override
     public void onPause() {
-        onForeground = false ;
         super.onPause();
-        transactionDoSave() ;
         barcodeView.pauseAndWait();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        onForeground = true ;
-        barcodeView.resume();
+        if( onForeground ) {
+            barcodeView.resume();
+        }
     }
 
     private void doRefresh() {
@@ -211,11 +213,6 @@ public class TestScanFragment extends Fragment {
 
     private void onLinkClicked(TracyPodTransactionManager.ScanRowModel clickedLink) {
         Log.w("DAMS","pouet pouet");
-    }
-
-    private void transactionDoSave() {
-        TracyPodTransactionManager tracyPod = TracyPodTransactionManager.getInstance(getActivity()) ;
-        tracyPod.onSave() ;
     }
 
 

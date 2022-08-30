@@ -22,13 +22,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Driver name" />
+                android:text="Receiver name" />
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Driver name"
+                android:hint="Receiver name"
                 android:inputType="text"
+                android:id="@+id/field_receiverName"
                 />
         </LinearLayout>
 
@@ -40,13 +41,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="License plate" />
+                android:text="Receiver location" />
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="License plate"
+                android:hint="Receiver location"
                 android:inputType="text"
+                android:id="@+id/field_receiverLocation"
                 />
         </LinearLayout>
 
@@ -61,6 +63,7 @@
                 android:layout_height="wrap_content"
                 android:text="Signature" />
             <com.github.gcacace.signaturepad.views.SignaturePad
+                android:saveEnabled="false"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:background="@color/mygray"

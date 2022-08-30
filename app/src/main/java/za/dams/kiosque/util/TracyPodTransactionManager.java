@@ -1,15 +1,19 @@
 package za.dams.kiosque.util;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class TracyPodTransactionManager {
@@ -40,12 +44,15 @@ public class TracyPodTransactionManager {
     private UUID mTransactionUUID = null ;
     private ArrayList<ScanRowModel> mArrScanRows = null ;
     private ArrayList<PhotoModel> mArrPhotos = null ;
+    private HashMap<String,String> mMapFields = null ;
+    private Bitmap mSignatureBitmap = null ;
 
     private TracyPodTransactionManager( Context c ) {
         mContext = c ;
         mTransactionUUID = null ;
         mArrScanRows = new ArrayList<ScanRowModel>() ;
         mArrPhotos = new ArrayList<PhotoModel>() ;
+        mMapFields = new HashMap<String,String>() ;
     }
     private TracyPodTransactionManager( Context c , JSONObject jsonObject ) {
         mContext = c ;
@@ -208,6 +215,16 @@ public class TracyPodTransactionManager {
         }
     }
 
+    public void setField( String fieldName, String fieldValue ) {
+        mMapFields.put(fieldName,fieldValue) ;
+    }
+    public String getField( String fieldName ) {
+        return mMapFields.get(fieldName) ;
+    }
+    public void setSignatureBitmap( Bitmap signatureBmp ) {
+        mSignatureBitmap = signatureBmp ;
+    }
+
     private boolean isEmpty() {
         if( mArrScanRows.size() > 0 ) {
             return false ;
@@ -250,6 +267,20 @@ public class TracyPodTransactionManager {
                 jsonArrPhotos.put(base64) ;
             }
             jsonObj.put("arrBase64Photos", jsonArrPhotos);
+
+            JSONObject jsonFields = new JSONObject();
+            for(Map.Entry<String, String> entry : mMapFields.entrySet()) {
+                jsonFields.put(entry.getKey(),entry.getValue());
+            }
+            jsonObj.put("objFields", jsonFields);
+
+            if( mSignatureBitmap != null ) {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                mSignatureBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
+                String imgJpegBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                jsonObj.put("signatureBase64", imgJpegBase64);
+            }
 
             return jsonObj;
         } catch(Exception e) {
