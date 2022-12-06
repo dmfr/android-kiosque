@@ -20,6 +20,10 @@
             android:label="PoD 6/07/2022 14h41"
             />
         <activity
+            android:name=".PeopleActivity"
+            android:label="KN People - Enregistrement"
+            />
+        <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Kiosque.NoActionBar">

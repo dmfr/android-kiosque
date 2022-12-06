@@ -29,4 +29,9 @@
         android:orderInCategory="100"
         android:title="TEST !"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_people"
+        android:orderInCategory="100"
+        android:title="KN People (dev)"
+        app:showAsAction="never" />
 </menu>

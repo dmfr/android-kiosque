@@ -158,6 +158,10 @@ implements FragmentManager.OnBackStackChangedListener
             //testFragment();
             testActivity();
         }
+        if (id == R.id.action_people) {
+            //testFragment();
+            peopleActivity();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -397,6 +401,12 @@ implements FragmentManager.OnBackStackChangedListener
         AlertDialog alert = builder.create();
         alert.show();
     }
+    public void peopleActivity() {
+        Intent intentLaunch = new Intent(this, PeopleActivity.class);
+        startActivity(intentLaunch);
+    }
+
+
 
     @Override
     public void onScanResult(String scanResult) {
