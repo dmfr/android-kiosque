@@ -36,6 +36,7 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import za.dams.kiosque.util.SimpleImageLoader;
@@ -212,11 +213,22 @@ public class PeopleScanFragment extends Fragment {
     }
 
 
-    private void onLinkClicked(TracyPodTransactionManager.ScanRowModel clickedLink) {
+    private void onLinkClicked(ScanEntry clickedLink) {
         Log.w("DAMS","pouet pouet");
     }
 
 
+    private enum ScanTypes {
+        TYPE_PEOPLE, TYPE_ROLE, TYPE_CLIENT
+    }
+    public static class ScanEntry {
+        ScanTypes scanType ;
+        boolean status ;
+        String entryCode ;
+        String entryTxt ;
+    }
+
+    private HashMap<ScanTypes,ScanEntry> mScanEntries = new HashMap<>() ;
 
     private class ScanListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
 
@@ -235,21 +247,19 @@ public class PeopleScanFragment extends Fragment {
 
         @Override
         public int getCount() {
-            ArrayList<TracyPodTransactionManager.ScanRowModel> mData = mTracyPodTransactionManager.getArrScanRows();
-            if( mData==null ) {
-                return 0 ;
-            }
-            return mData.size() ;
+            return ScanTypes.values().length ;
         }
 
         @Override
-        public TracyPodTransactionManager.ScanRowModel getItem(int position) {
-            ArrayList<TracyPodTransactionManager.ScanRowModel> mData = mTracyPodTransactionManager.getArrScanRows();
-            if (position >= getCount()) {
-                return null;
+        public ScanEntry getItem(int position) {
+            ScanTypes type = ScanTypes.values()[position] ;
+            if( mScanEntries.get(type) == null ) {
+                ScanEntry se = new ScanEntry() ;
+                se.scanType = type ;
+                se.status = false ;
+                return se ;
             }
-
-            return mData.get(position) ;
+            return mScanEntries.get(type) ;
         }
 
         @Override
@@ -266,7 +276,7 @@ public class PeopleScanFragment extends Fragment {
                 return null;
             }
 
-            TracyPodTransactionManager.ScanRowModel scanRow = getItem(position) ;
+            ScanEntry se = getItem(position) ;
 
             View view;
             if (convertView == null) {
@@ -275,13 +285,31 @@ public class PeopleScanFragment extends Fragment {
                 view = convertView;
             }
 
-            view.setTag(scanRow);
+            view.setTag(se);
 
-            setText(view, R.id.item_title, scanRow.displayTitle);
-            setText(view, R.id.item_caption, scanRow.displayCaption);
+            String title = "" ;
+            switch( se.scanType ) {
+                case TYPE_ROLE:
+                    title = "Role / Métier" ;
+                    break ;
+                case TYPE_PEOPLE:
+                    title = "Collaborateur" ;
+                    break ;
+                case TYPE_CLIENT:
+                    title = "Client / Mission" ;
+                    break ;
+            }
+
+            if( se.status ) {
+                setText(view, R.id.item_title, se.entryTxt);
+                setText(view, R.id.item_caption, title);
+            } else {
+                setText(view, R.id.item_title, title);
+                setText(view, R.id.item_caption, null);
+            }
 
             View colorView = view.findViewById(R.id.color);
-            int color = getResources().getColor( true ? android.R.color.holo_green_light : R.color.grey ) ;
+            int color = getResources().getColor( se.status ? android.R.color.holo_green_light : R.color.grey ) ;
             colorView.setBackgroundColor( color );
 
             ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
@@ -307,9 +335,9 @@ public class PeopleScanFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            TracyPodTransactionManager.ScanRowModel clickedLink = getItem(position);
+            ScanEntry se = getItem(position);
 
-            PeopleScanFragment.this.onLinkClicked(clickedLink);
+            PeopleScanFragment.this.onLinkClicked(se);
         }
 
 
