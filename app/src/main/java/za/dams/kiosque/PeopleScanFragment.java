@@ -66,7 +66,8 @@ public class PeopleScanFragment extends Fragment {
                 return ;
             }
             lastQueryString.add(queryString);
-            PeopleScanFragment.this.doQueryScan(queryString);
+            //PeopleScanFragment.this.doQueryScan(queryString);
+            fakeScan();
         }
 
         @Override
@@ -163,16 +164,12 @@ public class PeopleScanFragment extends Fragment {
             return ;
         }
         sla.notifyDataSetChanged();
+
+        boolean buttonsVisible = mScanEntries.size() == ScanTypes.values().length ;
+        getView().findViewById(R.id.buttons).setVisibility(buttonsVisible ? View.VISIBLE : View.INVISIBLE);
     }
 
-    public void addDummy() {
-        ScanListAdapter sla = ((ScanListAdapter)((ListView)mListView).getAdapter()) ;
-        if( sla == null ) {
-            Log.w("DAMS","???") ;
-            return ;
-        }
-        sla.addDummy() ;
-    }
+
     public void openInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("(Debug) Input scan value");
@@ -201,6 +198,8 @@ public class PeopleScanFragment extends Fragment {
 
         builder.show();
     }
+
+
     private void setInputValue(String inputValue) {
         Log.w("DAMS","Dummy scan value : "+inputValue) ;
         doQueryScan(inputValue) ;
@@ -208,8 +207,7 @@ public class PeopleScanFragment extends Fragment {
 
 
     private void doQueryScan( String queryScan ) {
-        ScanQueryTask task = new ScanQueryTask(this.getActivity());
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,queryScan);
+
     }
 
 
@@ -229,6 +227,32 @@ public class PeopleScanFragment extends Fragment {
     }
 
     private HashMap<ScanTypes,ScanEntry> mScanEntries = new HashMap<>() ;
+
+    public void fakeScan() {
+        for( ScanTypes st : ScanTypes.values() ) {
+            if( mScanEntries.get(st) == null  ) {
+                ScanEntry se = new ScanEntry();
+                se.scanType = st ;
+                se.status = true ;
+                switch( st ) {
+                    case TYPE_PEOPLE:
+                        se.entryTxt = "Damien Mirand" ;
+                        break ;
+                    case TYPE_ROLE:
+                        se.entryTxt = "Cariste" ;
+                        break ;
+                    case TYPE_CLIENT:
+                        se.entryTxt = "Procter & Gamble" ;
+                        break ;
+                    default :
+                        return ;
+                }
+                mScanEntries.put(st,se) ;
+                break ;
+            }
+        }
+        doRefresh() ;
+    }
 
     private class ScanListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
 
@@ -341,91 +365,9 @@ public class PeopleScanFragment extends Fragment {
         }
 
 
-        public void addDummy() {
-            mTracyPodTransactionManager.addDummy();
-            notifyDataSetChanged();
-        }
+
     }
 
-    class ScanQueryTask extends AsyncTask<String, Void, TracyHttpRest.TracyHttpScanResponse> {
-        private Context mContext ;
-        private String queryString ;
 
-        private String responseError ;
-
-        public ScanQueryTask(Context c) {
-            mContext = c.getApplicationContext() ;
-        }
-
-        @Override
-        protected void onPreExecute(){
-            if( onForeground ) {
-                barcodeView.pauseAndWait();
-                mProgressDialog = ProgressDialog.show(
-                        PeopleScanFragment.this.getActivity(),
-                        "Scan query",
-                        "Please wait...",
-                        true);
-            }
-        }
-
-        @Override
-        protected TracyHttpRest.TracyHttpScanResponse doInBackground(String... scanQuery) {
-            try {
-                Thread.sleep(200) ;
-            } catch( Exception e ) {
-
-            }
-            if( scanQuery.length == 0 ) {
-                return null ;
-            }
-            queryString = scanQuery[0] ;
-
-            TracyHttpRest.TracyHttpScanResponse scanResponse = null ;
-            try {
-                scanResponse = TracyHttpRest.scanQuery(mContext, queryString) ;
-            } catch(Exception e) {
-                responseError = e.getMessage() ;
-            }
-
-            return scanResponse ;
-        }
-
-        @Override
-        protected void onPostExecute(TracyHttpRest.TracyHttpScanResponse scanResponse) {
-            if( scanResponse != null ) {
-                TracyPodTransactionManager.getInstance(mContext).addScanResponse(scanResponse);
-                doRefresh() ;
-            }
-            if( mProgressDialog != null ) {
-                mProgressDialog.dismiss() ;
-            }
-            if( scanResponse == null ) {
-                if( responseError == null ) {
-                    responseError = "Unknown error" ;
-                }
-                AlertDialog.Builder builder = new AlertDialog.Builder(PeopleScanFragment.this.getActivity());
-                builder.setTitle("Scan rejected")
-                        .setMessage(responseError)
-                        .setCancelable(false)
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        PeopleScanFragment.this.barcodeView.resume();
-                    }
-                });
-
-                AlertDialog alert = builder.create();
-                alert.show();
-            } else {
-                barcodeView.resume();
-            }
-        }
-    }
 
 }

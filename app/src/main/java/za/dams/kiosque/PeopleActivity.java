@@ -2,11 +2,14 @@ package za.dams.kiosque;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -35,7 +38,7 @@ public class PeopleActivity extends Activity {
 
         if (null == savedInstanceState) {
             getFragmentManager().beginTransaction()
-                    .replace(R.id.container, PeopleScanFragment.newInstance())
+                    .replace(R.id.container, PeopleScanFragment.newInstance(),"visible_fragment")
                     .commit();
         }
     }
@@ -76,6 +79,40 @@ public class PeopleActivity extends Activity {
                 startActivity(intent);
             }
         }
+    }
+
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_people, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_scandummy).setVisible( true );
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch( item.getItemId() ) {
+            case R.id.action_scandummy:
+                actionScanDummy();
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void actionScanDummy() {
+        Fragment f = getFragmentManager().findFragmentByTag("visible_fragment");
+        ((PeopleScanFragment)f).fakeScan();
     }
 
 }

@@ -23,6 +23,8 @@
         android:orientation="horizontal"
         android:layout_weight="1"
         android:weightSum="2"
+        android:visibility="invisible"
+        android:id="@+id/buttons"
         android:gravity="center">
 
         <Button
