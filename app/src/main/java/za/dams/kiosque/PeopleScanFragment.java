@@ -12,6 +12,8 @@ import android.graphics.drawable.ShapeDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -21,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,6 +41,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import za.dams.kiosque.util.SimpleImageLoader;
 import za.dams.kiosque.util.TracyHttpRest;
@@ -48,10 +53,21 @@ import za.dams.kiosque.util.TracyPodTransactionManager;
  * Use the {@link TestScanFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PeopleScanFragment extends Fragment {
+public class PeopleScanFragment extends Fragment implements View.OnClickListener {
+
+
+    public enum ScanModes {
+        ON_SINGLE, ON_PEOPLES, OFF_PEOPLES
+    }
 
     DecoratedBarcodeView barcodeView;
     ViewGroup mListView ;
+    Button btnSubmit ;
+    Button btnCancel ;
+
+    Timer mSubmitTimer ;
+
+    ScanModes mScanMode ;
 
     boolean onForeground = false ;
     protected ProgressDialog mProgressDialog;
@@ -78,14 +94,21 @@ public class PeopleScanFragment extends Fragment {
     public PeopleScanFragment() {
         // Required empty public constructor
     }
-    public static PeopleScanFragment newInstance() {
+    public static PeopleScanFragment newInstance(ScanModes mode) {
         PeopleScanFragment fragment = new PeopleScanFragment();
+        Bundle args = new Bundle();
+        args.putInt("mode", mode.ordinal());
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            int ScanModeIdx = getArguments().getInt("mode");
+            mScanMode = ScanModes.values()[ScanModeIdx] ;
+        }
     }
 
     @Override
@@ -101,6 +124,9 @@ public class PeopleScanFragment extends Fragment {
             adapter = new ScanListAdapter(getActivity());
         }
         listview.setAdapter(adapter);
+
+        btnSubmit.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
     }
 
     @Override
@@ -116,6 +142,9 @@ public class PeopleScanFragment extends Fragment {
         capture.decode();
          */
         barcodeView.decodeContinuous(callback);
+
+        btnSubmit = rootView.findViewById(R.id.btn_submit);
+        btnCancel = rootView.findViewById(R.id.btn_cancel);
 
         Log.w("DAMS","onCreateView") ;
 
@@ -159,6 +188,10 @@ public class PeopleScanFragment extends Fragment {
     }
 
     private void doRefresh() {
+        if( mSubmitTimer != null ) {
+            mSubmitTimer.cancel();
+        }
+
         ScanListAdapter sla = ((ScanListAdapter)((ListView)mListView).getAdapter()) ;
         if( sla == null ) {
             return ;
@@ -167,6 +200,21 @@ public class PeopleScanFragment extends Fragment {
 
         boolean buttonsVisible = mScanEntries.size() == ScanTypes.values().length ;
         getView().findViewById(R.id.buttons).setVisibility(buttonsVisible ? View.VISIBLE : View.INVISIBLE);
+
+        if( buttonsVisible ) {
+            mSubmitTimer = new Timer() ;
+            mSubmitTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                           doSubmit();
+                        }
+                    });
+                }
+            }, 1000);
+        }
     }
 
 
@@ -366,6 +414,58 @@ public class PeopleScanFragment extends Fragment {
 
     }
 
+
+    @Override
+    public void onClick(View v) {
+        if( v==btnSubmit ) {
+            doSubmit() ;
+        }
+        if( v==btnCancel ) {
+            doReset() ;
+        }
+    }
+
+
+    private void onAfterScan() {
+        if( mScanEntries.size() != ScanTypes.values().length ) {
+            return ;
+        }
+    }
+
+    private void doSubmit() {
+        if( mScanEntries.size() != ScanTypes.values().length ) {
+            return ;
+        }
+        mProgressDialog = ProgressDialog.show(
+                getActivity(),
+                "Sending transaction",
+                "Please wait...",
+                true);
+        Thread transactionEnd = new Thread() {
+            public void run() {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Handler mainHandler = new Handler(getActivity().getMainLooper());
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.dismiss();
+                        PeopleScanFragment.this.doReset();
+                    }
+                };
+                mainHandler.post(myRunnable);
+            };
+        };
+        transactionEnd.start();
+
+    }
+    private void doReset() {
+        mScanEntries.clear();
+        doRefresh() ;
+    }
 
 
 }

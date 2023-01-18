@@ -81,8 +81,9 @@ public class PeopleModesFragment extends Fragment {
         ScanListAdapter adapter = (ScanListAdapter)(listview.getAdapter()) ;
         if (adapter == null) {
             ArrayList<Mode> modes = new ArrayList<>();
-            modes.add( new Mode("okeo","opkokok"));
-            modes.add( new Mode("okeo","opkokok"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"Affectation individuelle","People + Metier + Client"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_PEOPLES,"Affecation groupe","Metier + Client > People(s)"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.OFF_PEOPLES,"Fermeture journée", "Peoples OUT"));
 
             adapter = new ScanListAdapter(getActivity(),modes);
         }
@@ -127,16 +128,18 @@ public class PeopleModesFragment extends Fragment {
 
     private void onLinkClicked(Mode clickedLink) {
         if( getActivity() instanceof PeopleActivity ) {
-            ((PeopleActivity)getActivity()).launchScanMode() ;
+            ((PeopleActivity)getActivity()).launchScanMode(clickedLink.mode) ;
         }
     }
 
 
     private static class Mode {
+        public PeopleScanFragment.ScanModes mode ;
         public String modeTitle;
         public String modeCaption;
 
-        public Mode(String modeTitle, String modeCaption) {
+        public Mode(PeopleScanFragment.ScanModes mode, String modeTitle, String modeCaption) {
+            this.mode = mode ;
             this.modeTitle = modeTitle;
             this.modeCaption = modeCaption;
         }
@@ -186,11 +189,11 @@ public class PeopleModesFragment extends Fragment {
 
 
 
-            setText(view, R.id.item_title, "Pouet pouet");
-            setText(view, R.id.item_caption, "pouet pouet pouet");
+            setText(view, R.id.item_title, mode.modeTitle);
+            setText(view, R.id.item_caption, mode.modeCaption);
 
             View colorView = view.findViewById(R.id.color);
-            int color = getResources().getColor( R.color.grey ) ;
+            int color = getResources().getColor( R.color.purple_500 ) ;
             colorView.setBackgroundColor( color );
 
             ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
