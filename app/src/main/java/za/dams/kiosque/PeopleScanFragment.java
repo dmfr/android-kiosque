@@ -211,9 +211,7 @@ public class PeopleScanFragment extends Fragment {
     }
 
 
-    private void onLinkClicked(ScanEntry clickedLink) {
-        Log.w("DAMS","pouet pouet");
-    }
+    private void onLinkClicked(ScanEntry clickedLink) {}
 
 
     private enum ScanTypes {

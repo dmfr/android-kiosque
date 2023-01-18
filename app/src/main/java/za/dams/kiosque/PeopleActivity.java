@@ -3,11 +3,13 @@ package za.dams.kiosque;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -15,7 +17,7 @@ import android.widget.Toolbar;
 
 import androidx.core.app.ActivityCompat;
 
-public class PeopleActivity extends Activity {
+public class PeopleActivity extends Activity implements FragmentManager.OnBackStackChangedListener {
 
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
     private static final String[] VIDEO_PERMISSIONS = {
@@ -35,12 +37,16 @@ public class PeopleActivity extends Activity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setActionBar(toolbar);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        getFragmentManager().addOnBackStackChangedListener(this);
 
         if (null == savedInstanceState) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.container, PeopleModesFragment.newInstance(),"visible_fragment")
                     .commit();
         }
+        updateUI() ;
     }
     @Override
     protected void onDestroy() {
@@ -93,7 +99,8 @@ public class PeopleActivity extends Activity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.action_scandummy).setVisible( true );
+        boolean isScanFragment = getCurrentFragment() instanceof PeopleScanFragment ;
+        menu.findItem(R.id.action_scandummy).setVisible( isScanFragment );
         return true;
     }
 
@@ -103,6 +110,8 @@ public class PeopleActivity extends Activity {
             case R.id.action_scandummy:
                 actionScanDummy();
                 break;
+            case android.R.id.home :
+                onBackPressed();
             default:
                 break;
         }
@@ -117,5 +126,34 @@ public class PeopleActivity extends Activity {
         }
     }
 
+
+
+
+    public void launchScanMode() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, PeopleScanFragment.newInstance(),"visible_fragment")
+                .addToBackStack(null)
+                .commit();
+    }
+
+
+
+    private Fragment getCurrentFragment() {
+        Fragment currentBackStackFragment = getFragmentManager().findFragmentByTag("visible_fragment");
+        return currentBackStackFragment ;
+    }
+
+    private void updateUI() {
+        Fragment f = getCurrentFragment() ;
+        boolean hasBackBtn = (f !=null ) && !(f instanceof PeopleModesFragment);
+        getActionBar().setDisplayHomeAsUpEnabled(hasBackBtn);
+
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        updateUI() ;
+    }
 }
 

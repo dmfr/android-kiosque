@@ -87,6 +87,7 @@ public class PeopleModesFragment extends Fragment {
             adapter = new ScanListAdapter(getActivity(),modes);
         }
         listview.setAdapter(adapter);
+        listview.setOnItemClickListener(adapter);
     }
 
     @Override
@@ -125,7 +126,9 @@ public class PeopleModesFragment extends Fragment {
 
 
     private void onLinkClicked(Mode clickedLink) {
-        Log.w("DAMS","pouet pouet");
+        if( getActivity() instanceof PeopleActivity ) {
+            ((PeopleActivity)getActivity()).launchScanMode() ;
+        }
     }
 
 
@@ -213,7 +216,6 @@ public class PeopleModesFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Mode mm = getItem(position);
-
             PeopleModesFragment.this.onLinkClicked(mm);
         }
 
