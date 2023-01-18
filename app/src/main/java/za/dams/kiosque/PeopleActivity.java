@@ -38,7 +38,7 @@ public class PeopleActivity extends Activity {
 
         if (null == savedInstanceState) {
             getFragmentManager().beginTransaction()
-                    .replace(R.id.container, PeopleScanFragment.newInstance(),"visible_fragment")
+                    .replace(R.id.container, PeopleModesFragment.newInstance(),"visible_fragment")
                     .commit();
         }
     }
@@ -112,7 +112,9 @@ public class PeopleActivity extends Activity {
 
     public void actionScanDummy() {
         Fragment f = getFragmentManager().findFragmentByTag("visible_fragment");
-        ((PeopleScanFragment)f).fakeScan();
+        if( f instanceof PeopleScanFragment ) {
+            ((PeopleScanFragment) f).fakeScan();
+        }
     }
 
 }
