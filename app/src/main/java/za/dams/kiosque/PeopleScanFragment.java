@@ -36,6 +36,9 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
@@ -72,8 +75,9 @@ public class PeopleScanFragment extends Fragment implements View.OnClickListener
     boolean onForeground = false ;
     protected ProgressDialog mProgressDialog;
 
+
+    public ArrayList<String> lastQueryString = new ArrayList<String>() ;
     private BarcodeCallback callback = new BarcodeCallback() {
-        ArrayList<String> lastQueryString = new ArrayList<String>() ;
 
         @Override
         public void barcodeResult(BarcodeResult result) {
@@ -83,7 +87,7 @@ public class PeopleScanFragment extends Fragment implements View.OnClickListener
             }
             lastQueryString.add(queryString);
             //PeopleScanFragment.this.doQueryScan(queryString);
-            fakeScan();
+            qrScan(queryString);
         }
 
         @Override
@@ -298,6 +302,39 @@ public class PeopleScanFragment extends Fragment implements View.OnClickListener
         doRefresh() ;
     }
 
+    public void qrScanRegister(ScanTypes st, String txt) {
+        ScanEntry se = new ScanEntry();
+        se.scanType = st ;
+        se.status = true ;
+        se.entryTxt = txt ;
+        mScanEntries.put(st,se) ;
+        doRefresh() ;
+    }
+    public void qrScan(String scanString) {
+        ScanTypes st = null ;
+        String txt = null ;
+        try {
+            JSONObject jo = new JSONObject(scanString);
+            if( jo.has("people_code") ) {
+                st = ScanTypes.TYPE_PEOPLE ;
+                txt = jo.optString("people_txt") ;
+            }
+            if( jo.has("cli_code") ) {
+                st = ScanTypes.TYPE_CLIENT ;
+                txt = jo.optString("cli_txt") ;
+            }
+            if( jo.has("role_code") ) {
+                st = ScanTypes.TYPE_ROLE ;
+                txt = jo.optString("role_txt") ;
+            }
+        } catch(Exception e ) {
+
+        }
+        if( st != null ) {
+            qrScanRegister(st,txt) ;
+        }
+    }
+
     private class ScanListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
 
         private static final String TAG = "ScanListAdapter";
@@ -462,6 +499,7 @@ public class PeopleScanFragment extends Fragment implements View.OnClickListener
     }
     private void doReset() {
         mScanEntries.clear();
+        lastQueryString = new ArrayList<String>() ;
         doRefresh() ;
     }
 
