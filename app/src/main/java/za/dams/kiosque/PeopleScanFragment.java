@@ -146,8 +146,6 @@ public class PeopleScanFragment extends Fragment implements View.OnClickListener
         btnSubmit = rootView.findViewById(R.id.btn_submit);
         btnCancel = rootView.findViewById(R.id.btn_cancel);
 
-        Log.w("DAMS","onCreateView") ;
-
         return rootView;
     }
 

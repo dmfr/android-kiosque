@@ -107,9 +107,6 @@ implements FragmentManager.OnBackStackChangedListener
         updateUI();
 
 
-        Log.w("DAMS","test") ;
-
-
         IntentFilter filter = new IntentFilter();
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         filter.addAction(getResources().getString(R.string.activity_intent_filter_action));

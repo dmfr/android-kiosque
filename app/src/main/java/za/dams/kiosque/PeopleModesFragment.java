@@ -82,7 +82,7 @@ public class PeopleModesFragment extends Fragment {
         if (adapter == null) {
             ArrayList<Mode> modes = new ArrayList<>();
             modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"Affectation individuelle","People + Metier + Client"));
-            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_PEOPLES,"Affecation groupe","Metier + Client > People(s)"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_PEOPLES,"Affectation groupe","Metier + Client > People(s)"));
             modes.add( new Mode( PeopleScanFragment.ScanModes.OFF_PEOPLES,"Fermeture journée", "Peoples OUT"));
 
             adapter = new ScanListAdapter(getActivity(),modes);
