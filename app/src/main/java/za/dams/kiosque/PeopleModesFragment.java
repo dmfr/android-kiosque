@@ -90,7 +90,7 @@ public class PeopleModesFragment extends Fragment {
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(adapter);
 
-        ((PeopleActivity)getActivity()).setTitle("Select scan mode");
+        ((PeopleActivity)getActivity()).setTitle("KN People : Select scan mode");
     }
 
     @Override

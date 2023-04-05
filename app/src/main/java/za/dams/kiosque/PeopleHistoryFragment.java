@@ -82,9 +82,9 @@ public class PeopleHistoryFragment extends Fragment {
         if (adapter == null) {
             ArrayList<Mode> modes = new ArrayList<>();
             modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:10:05","People : Cyril Destrumel\nRole : OPERATEUR / EMBALLEUR\nClient: DPNA"));
-            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:10:05","People : Cyril Destrumel\nRole : OPERATEUR / EMBALLEUR\nClient: DPNA"));
-            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:10:05","People : Cyril Destrumel\nRole : OPERATEUR / EMBALLEUR\nClient: DPNA"));
-            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:10:05","People : Cyril Destrumel\nRole : OPERATEUR / EMBALLEUR\nClient: DPNA"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:09:51","People : Audrey Courbet\nRole : PREPARATEUR DE COMMANDES\nClient: EVERGREEN"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:09:29","People : Sébastien Basson\nRole : CONTRÔLE\nClient: WERNER MERTZ"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:09:22","People : David Lebon\nRole : CONTROLEUR/FLASHEUR\nClient: SPHERE EMB"));
 
             adapter = new ScanListAdapter(getActivity(),modes);
         }
