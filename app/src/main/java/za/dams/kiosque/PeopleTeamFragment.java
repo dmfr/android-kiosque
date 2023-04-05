@@ -22,6 +22,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -49,7 +50,7 @@ import za.dams.kiosque.util.TracyPodTransactionManager;
  * Use the {@link TestScanFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PeopleModesFragment extends Fragment {
+public class PeopleTeamFragment extends Fragment {
 
     ViewGroup mListView ;
 
@@ -57,11 +58,11 @@ public class PeopleModesFragment extends Fragment {
     protected ProgressDialog mProgressDialog;
 
 
-    public PeopleModesFragment() {
+    public PeopleTeamFragment() {
         // Required empty public constructor
     }
-    public static PeopleModesFragment newInstance() {
-        PeopleModesFragment fragment = new PeopleModesFragment();
+    public static PeopleTeamFragment newInstance() {
+        PeopleTeamFragment fragment = new PeopleTeamFragment();
         return fragment;
     }
 
@@ -80,17 +81,17 @@ public class PeopleModesFragment extends Fragment {
         }
         ScanListAdapter adapter = (ScanListAdapter)(listview.getAdapter()) ;
         if (adapter == null) {
-            ArrayList<Mode> modes = new ArrayList<>();
-            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"Affectation individuelle","People + Metier + Client"));
-            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_PEOPLES,"Affectation groupe","Metier + Client > People(s)"));
-            modes.add( new Mode( PeopleScanFragment.ScanModes.OFF_PEOPLES,"Fermeture journée", "Peoples OUT"));
-
-            adapter = new ScanListAdapter(getActivity(),modes);
+            ArrayList<TeamPeople> peoples = new ArrayList<>();
+            peoples.add( new TeamPeople( "Damien Mirand",true));
+            peoples.add( new TeamPeople( "Hervé Danet",true));
+            peoples.add( new TeamPeople( "Laure Tremblay",true));
+            peoples.add( new TeamPeople( "Alain Lahaye",false));
+            adapter = new ScanListAdapter(getActivity(),peoples);
         }
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(adapter);
 
-        ((PeopleActivity)getActivity()).setTitle("Select scan mode");
+        ((PeopleActivity)getActivity()).setTitle("Equipe RECEPTION");
     }
 
     @Override
@@ -128,37 +129,33 @@ public class PeopleModesFragment extends Fragment {
 
 
 
-    private void onLinkClicked(Mode clickedLink) {
-        if( getActivity() instanceof PeopleActivity ) {
-            ((PeopleActivity)getActivity()).launchScanMode(clickedLink.mode) ;
+    private void onLinkClicked(TeamPeople clickedLink) {
+
+    }
+
+
+    private static class TeamPeople {
+        public String txtName;
+        public boolean checked ;
+
+        public TeamPeople(String txtName, boolean checked) {
+            this.txtName = txtName ;
+            this.checked = checked;
         }
     }
 
 
-    private static class Mode {
-        public PeopleScanFragment.ScanModes mode ;
-        public String modeTitle;
-        public String modeCaption;
 
-        public Mode(PeopleScanFragment.ScanModes mode, String modeTitle, String modeCaption) {
-            this.mode = mode ;
-            this.modeTitle = modeTitle;
-            this.modeCaption = modeCaption;
-        }
-    }
-
-
-
-    private class ScanListAdapter extends ArrayAdapter<Mode> implements AdapterView.OnItemClickListener {
+    private class ScanListAdapter extends ArrayAdapter<TeamPeople> implements AdapterView.OnItemClickListener {
 
         private static final String TAG = "ScanListAdapter";
 
         private LayoutInflater mInflater;
-        private static final int LAYOUT = R.layout.fragment_linkslist_item;
+        private static final int LAYOUT = R.layout.fragment_team_item;
 
 
-        public ScanListAdapter(Context context, ArrayList<Mode> modes) {
-            super(context,0,modes);
+        public ScanListAdapter(Context context, ArrayList<TeamPeople> peoples) {
+            super(context,0,peoples);
             mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
@@ -186,29 +183,16 @@ public class PeopleModesFragment extends Fragment {
                 view = convertView;
             }
 
-            Mode mode = getItem(position) ;
-            view.setTag(mode);
+            TeamPeople people = getItem(position) ;
+            view.setTag(people);
 
 
 
-            setText(view, R.id.item_title, mode.modeTitle);
-            setText(view, R.id.item_caption, mode.modeCaption);
+            setText(view, R.id.txtName, people.txtName);
+            ((CheckBox) view.findViewById(R.id.checkBox)).setChecked(people.checked);
+            //setText(view, R.id.item_caption, mode.modeCaption);
 
-            View colorView = view.findViewById(R.id.color);
-            int color = getResources().getColor( R.color.purple_500 ) ;
-            colorView.setBackgroundColor( color );
 
-            ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
-            imgbtn.setVisibility(View.GONE);
-            /*
-            imgbtn.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_more));
-            imgbtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((ViewGroup)view).showContextMenu();
-                }
-            });
-             */
 
 
             return view;
@@ -220,8 +204,8 @@ public class PeopleModesFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Mode mm = getItem(position);
-            PeopleModesFragment.this.onLinkClicked(mm);
+            TeamPeople pp = getItem(position);
+            PeopleTeamFragment.this.onLinkClicked(pp);
         }
 
 

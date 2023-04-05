@@ -4,6 +4,12 @@
     tools:context="za.dams.kiosque.PeopleActivity">
 
     <item
+        android:id="@+id/action_history"
+        android:orderInCategory="50"
+        android:title="History"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_scandummy"
         android:orderInCategory="100"
         android:title="FScan"

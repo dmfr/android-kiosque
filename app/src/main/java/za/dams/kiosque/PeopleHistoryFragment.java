@@ -49,7 +49,7 @@ import za.dams.kiosque.util.TracyPodTransactionManager;
  * Use the {@link TestScanFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PeopleModesFragment extends Fragment {
+public class PeopleHistoryFragment extends Fragment {
 
     ViewGroup mListView ;
 
@@ -57,11 +57,11 @@ public class PeopleModesFragment extends Fragment {
     protected ProgressDialog mProgressDialog;
 
 
-    public PeopleModesFragment() {
+    public PeopleHistoryFragment() {
         // Required empty public constructor
     }
-    public static PeopleModesFragment newInstance() {
-        PeopleModesFragment fragment = new PeopleModesFragment();
+    public static PeopleHistoryFragment newInstance() {
+        PeopleHistoryFragment fragment = new PeopleHistoryFragment();
         return fragment;
     }
 
@@ -81,16 +81,17 @@ public class PeopleModesFragment extends Fragment {
         ScanListAdapter adapter = (ScanListAdapter)(listview.getAdapter()) ;
         if (adapter == null) {
             ArrayList<Mode> modes = new ArrayList<>();
-            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"Affectation individuelle","People + Metier + Client"));
-            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_PEOPLES,"Affectation groupe","Metier + Client > People(s)"));
-            modes.add( new Mode( PeopleScanFragment.ScanModes.OFF_PEOPLES,"Fermeture journée", "Peoples OUT"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:10:05","People : Cyril Destrumel\nRole : OPERATEUR / EMBALLEUR\nClient: DPNA"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:10:05","People : Cyril Destrumel\nRole : OPERATEUR / EMBALLEUR\nClient: DPNA"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:10:05","People : Cyril Destrumel\nRole : OPERATEUR / EMBALLEUR\nClient: DPNA"));
+            modes.add( new Mode( PeopleScanFragment.ScanModes.ON_SINGLE,"3/04 12:10:05","People : Cyril Destrumel\nRole : OPERATEUR / EMBALLEUR\nClient: DPNA"));
 
             adapter = new ScanListAdapter(getActivity(),modes);
         }
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(adapter);
 
-        ((PeopleActivity)getActivity()).setTitle("Select scan mode");
+        ((PeopleActivity)getActivity()).setTitle("History / Recent scans");
     }
 
     @Override
@@ -129,9 +130,7 @@ public class PeopleModesFragment extends Fragment {
 
 
     private void onLinkClicked(Mode clickedLink) {
-        if( getActivity() instanceof PeopleActivity ) {
-            ((PeopleActivity)getActivity()).launchScanMode(clickedLink.mode) ;
-        }
+
     }
 
 
@@ -154,7 +153,7 @@ public class PeopleModesFragment extends Fragment {
         private static final String TAG = "ScanListAdapter";
 
         private LayoutInflater mInflater;
-        private static final int LAYOUT = R.layout.fragment_linkslist_item;
+        private static final int LAYOUT = R.layout.fragment_history_item;
 
 
         public ScanListAdapter(Context context, ArrayList<Mode> modes) {
@@ -195,7 +194,7 @@ public class PeopleModesFragment extends Fragment {
             setText(view, R.id.item_caption, mode.modeCaption);
 
             View colorView = view.findViewById(R.id.color);
-            int color = getResources().getColor( R.color.purple_500 ) ;
+            int color = getResources().getColor( android.R.color.holo_green_light ) ;
             colorView.setBackgroundColor( color );
 
             ImageButton imgbtn = (ImageButton)view.findViewById(R.id.imgbutton) ;
@@ -221,7 +220,7 @@ public class PeopleModesFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Mode mm = getItem(position);
-            PeopleModesFragment.this.onLinkClicked(mm);
+            PeopleHistoryFragment.this.onLinkClicked(mm);
         }
 
 

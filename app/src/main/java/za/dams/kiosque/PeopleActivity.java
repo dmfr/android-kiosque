@@ -110,6 +110,9 @@ public class PeopleActivity extends Activity implements FragmentManager.OnBackSt
             case R.id.action_scandummy:
                 actionScanDummy();
                 break;
+            case R.id.action_history:
+                launchHistory();
+                break;
             case android.R.id.home :
                 onBackPressed();
             default:
@@ -132,6 +135,18 @@ public class PeopleActivity extends Activity implements FragmentManager.OnBackSt
     public void launchScanMode(PeopleScanFragment.ScanModes scanMode) {
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, PeopleScanFragment.newInstance(scanMode),"visible_fragment")
+                .addToBackStack(null)
+                .commit();
+    }
+    public void launchScanModeTeam() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, PeopleTeamFragment.newInstance(),"visible_fragment")
+                .addToBackStack(null)
+                .commit();
+    }
+    public void launchHistory(){
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, PeopleHistoryFragment.newInstance(),"visible_fragment")
                 .addToBackStack(null)
                 .commit();
     }

@@ -128,9 +128,12 @@ public class PeopleScanFragment extends Fragment implements View.OnClickListener
             adapter = new ScanListAdapter(getActivity());
         }
         listview.setAdapter(adapter);
+        listview.setOnItemClickListener(adapter);
 
         btnSubmit.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
+
+        ((PeopleActivity)getActivity()).setTitle("Scan: People+Client+Role");
     }
 
     @Override
@@ -261,7 +264,11 @@ public class PeopleScanFragment extends Fragment implements View.OnClickListener
     }
 
 
-    private void onLinkClicked(ScanEntry clickedLink) {}
+    private void onLinkClicked(ScanEntry clickedLink) {
+        if( clickedLink.scanType==ScanTypes.TYPE_PEOPLE ) {
+            ((PeopleActivity)getActivity()).launchScanModeTeam();
+        }
+    }
 
 
     private enum ScanTypes {
@@ -440,6 +447,7 @@ public class PeopleScanFragment extends Fragment implements View.OnClickListener
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Log.w("DAMS","pouet pouet pouet") ;
             ScanEntry se = getItem(position);
 
             PeopleScanFragment.this.onLinkClicked(se);
