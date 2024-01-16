@@ -12,6 +12,10 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,23 +23,25 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-
-
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.View;
-
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Toast;
 import android.widget.Toolbar;
+
+import java.io.OutputStream;
+import java.util.Set;
+import java.util.UUID;
 
 import za.dams.kiosque.util.LinksManager;
 import za.dams.kiosque.util.TracyPodTransactionManager;
@@ -59,6 +65,8 @@ implements FragmentManager.OnBackStackChangedListener
     boolean mKeyboardVisible ;
 
     private MenuItem mCheckToolbar ;
+
+    protected ProgressDialog mProgressDialog;
 
     @Override
     public void onBackPressed() {
@@ -158,6 +166,10 @@ implements FragmentManager.OnBackStackChangedListener
         if (id == R.id.action_people) {
             //testFragment();
             peopleActivity();
+        }
+        if (id == R.id.action_print) {
+            //testFragment();
+            doBluetoothPrint();
         }
 
         return super.onOptionsItemSelected(item);
@@ -541,4 +553,120 @@ implements FragmentManager.OnBackStackChangedListener
     public void onSignatureOpen() {
         signatureFragment();
     }
+
+
+
+    public void doBluetoothPrint() {
+        String str = null ;
+        new BluetoothPrintingTask(this).execute(str);
+    }
+    class BluetoothPrintingTask extends AsyncTask<String, Void, Void> {
+
+        Context mContext ;
+        BluetoothPrinting mBluetoothPrint ;
+
+        public BluetoothPrintingTask(Context context) {
+            mContext = context ;
+
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog = ProgressDialog.show(
+                    mContext,
+                    "Sending transaction",
+                    "Please wait...",
+                    true);
+        }
+
+        /**
+         * Actual download method.
+         */
+        @Override
+        protected Void doInBackground(String... params) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            String zpl = "^XA^CF0,60^FO250,50^GB100,100,100^FS^FO275,75^FR^GB100,100,100^FS^FO93,93^GB40,40,40^FS^XZ" ;
+
+            BluetoothPrinting btp = new BluetoothPrinting(mContext) ;
+            btp.ListPairedDevices();
+            btp.printString(zpl) ;
+
+            return null ;
+        }
+
+        /**
+         * Once the image is downloaded, associates it to the imageView
+         */
+        @Override
+        protected void onPostExecute(Void v) {
+
+            mProgressDialog.dismiss();
+        }
+
+    }
+
+    private static class BluetoothPrinting {
+        Context mContext ;
+        BluetoothAdapter mBluetoothAdapter ;
+
+        private UUID applicationUUID = UUID
+                .fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+        BluetoothPrinting(Context context) {
+            mContext = context ;
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        }
+        private BluetoothDevice ListPairedDevices() {
+            Set<BluetoothDevice> mPairedDevices = mBluetoothAdapter
+                    .getBondedDevices();
+            if (mPairedDevices.size() > 0) {
+                for (BluetoothDevice mDevice : mPairedDevices) {
+                    Log.v("DAMS", "PairedDevices: " + mDevice.getName() + "  "
+                            + mDevice.getAddress());
+                }
+            }
+            if( mPairedDevices.size()==1 ) {
+                return mPairedDevices.iterator().next() ;
+            }
+            return null ;
+        }
+
+        private boolean printString( String zpl ) {
+            BluetoothDevice btd = ListPairedDevices() ;
+            if( btd == null ) {
+                return false;
+            }
+
+            try {
+            BluetoothSocket bts = btd
+                    .createRfcommSocketToServiceRecord(applicationUUID);
+                //mBluetoothAdapter.cancelDiscovery() ;
+
+                bts.connect();
+                OutputStream os = bts.getOutputStream();
+                byte[] b = zpl.getBytes("UTF-8") ;
+                Log.w("DAMS","b is len="+b.length) ;
+                os.write(b);
+                Thread.sleep(500);
+                bts.close();
+
+                Log.w("DAMS","Printing done !");
+
+
+                return true ;
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
+            return false ;
+        }
+
+    }
+
 }
