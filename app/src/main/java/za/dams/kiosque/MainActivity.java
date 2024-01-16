@@ -369,14 +369,6 @@ implements FragmentManager.OnBackStackChangedListener
         newFragment.show(ft, "dialog");
     }
 
-    public void testFragment() {
-
-        TestFragment newFragment = TestFragment.newInstance("str1","str2");
-        FragmentTransaction ft = getFragmentManager().beginTransaction() ;
-        ft.replace(R.id.fragment_container, (Fragment)newFragment, "visible_fragment");
-        ft.addToBackStack(null);
-        ft.commit();
-    }
 
     public void testActivity() {
         boolean directLaunch = true ;
