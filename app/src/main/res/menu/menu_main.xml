@@ -34,5 +34,6 @@
         android:id="@+id/action_print"
         android:orderInCategory="100"
         android:title="Print test"
+        android:visible="false"
         app:showAsAction="never" />
 </menu>
