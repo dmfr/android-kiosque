@@ -44,7 +44,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import za.dams.kiosque.util.LinksManager;
-import za.dams.kiosque.util.TracyPodTransactionManager;
 
 
 public class MainActivity extends Activity
@@ -162,10 +161,6 @@ implements FragmentManager.OnBackStackChangedListener
         if (id == R.id.action_test) {
             //testFragment();
             testActivity();
-        }
-        if (id == R.id.action_people) {
-            //testFragment();
-            peopleActivity();
         }
         if (id == R.id.action_print) {
             //testFragment();
@@ -371,39 +366,7 @@ implements FragmentManager.OnBackStackChangedListener
 
 
     public void testActivity() {
-        boolean directLaunch = true ;
-        TracyPodTransactionManager tracyPod = TracyPodTransactionManager.getInstance(this) ;
-        if( tracyPod.getTransactionUUID() != null ) {
-            directLaunch = false ;
-        }
-
-
         Intent intentLaunch = new Intent(this, TestActivity.class);
-
-        if( directLaunch ) {
-            startActivity(intentLaunch);
-            return ;
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Pending transaction. Resume or discard ?")
-                .setCancelable(true)
-                .setPositiveButton("Resume", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivity(intentLaunch);
-                    }
-                })
-                .setNegativeButton("Discard", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        TracyPodTransactionManager.purgeInstance(MainActivity.this);
-                        startActivity(intentLaunch);
-                    }
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-    public void peopleActivity() {
-        Intent intentLaunch = new Intent(this, PeopleActivity.class);
         startActivity(intentLaunch);
     }
 

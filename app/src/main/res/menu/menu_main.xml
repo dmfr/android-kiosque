@@ -31,11 +31,6 @@
         android:visible="false"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_people"
-        android:orderInCategory="100"
-        android:title="KN People (dev)"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_print"
         android:orderInCategory="100"
         android:title="Print test"
