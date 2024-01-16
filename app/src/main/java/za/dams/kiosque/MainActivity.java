@@ -520,8 +520,15 @@ implements FragmentManager.OnBackStackChangedListener
                 }
                  */
 
-                //String decodedData = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_data));
-                String decodedData = intent.getStringExtra("data");
+                String datawedgeKey = getResources().getString(R.string.datawedge_intent_key_data) ;
+                String defaultKey = "data" ; //honeywell
+
+                String decodedData = null ;
+                if( intent.hasExtra(datawedgeKey) ) {
+                    decodedData = intent.getStringExtra(datawedgeKey) ;
+                } else {
+                    decodedData = intent.getStringExtra(defaultKey) ;
+                }
                 //Log.w("DAMS",decodedData) ;
                 try {
                     onScanResult(decodedData) ;
